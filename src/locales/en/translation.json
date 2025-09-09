@@ -1,0 +1,12 @@
+{
+  "brand": "TOM",
+  "nav": {
+    "home": "Home",
+    "menu": "Menu",
+    "posts": "Posts",
+    "about": "About",
+    "contact": "Contact",
+    "careers": "Careers"
+  },
+  "cta": { "call": "Call to Order" }
+}

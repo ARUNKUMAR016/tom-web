@@ -1,0 +1,12 @@
+{
+  "brand": "TOM",
+  "nav": {
+    "home": "Hem",
+    "menu": "Meny",
+    "posts": "Inlägg",
+    "about": "Om oss",
+    "contact": "Kontakt",
+    "careers": "Karriär"
+  },
+  "cta": { "call": "Ring för att beställa" }
+}
