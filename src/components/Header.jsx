@@ -1,86 +1,89 @@
-import { Link, NavLink } from "react-router-dom";
-import { useState } from "react";
-import { Menu, X } from "lucide-react"; // icons
+import React from "react";
+import { NavLink, Link } from "react-router-dom";
 
-function Header() {
-  const [mobileOpen, setMobileOpen] = useState(false);
+const active =
+  "relative text-[#253428] font-semibold after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:w-6 after:rounded-full after:bg-[#728175] transition-colors";
+const base =
+  "text-[#253428]/80 hover:text-[#253428] transition-colors";
 
-  const navItems = [
-    { to: "/", label: "Home" },
-    { to: "/menu", label: "Menu" },
-    { to: "/posts", label: "Posts" },
-    { to: "/about", label: "About" },
-    { to: "/contact", label: "Contact" },
-    { to: "/careers", label: "Careers" },
-    { to: "/admin", label: "Admin" },
-  ];
 
+const Header = () => {
   return (
-    <header className="bg-white/90 backdrop-blur sticky top-0 z-40 border-b">
-      <div className="container mx-auto px-4 py-3 flex items-center gap-4">
-        
-        {/* Logo */}
-        <Link to="/" className="font-serif text-2xl text-[#7A1F1F]">
-          TOM
+    <header className="flex justify-between items-center py-6 px-10 bg-[#CDBF9C]/20 shadow-sm">
+      {/* Logo + Brand */}
+      <div className="flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-3">
+          <img
+            src="/logo1 (2).svg"
+            alt="Taste of Madurai Logo"
+            className="h-10 w-10 object-contain"
+            style={{
+              filter:
+                "invert(15%) sepia(10%) saturate(900%) hue-rotate(120deg) brightness(95%) contrast(90%)",
+            }}
+          />
+          <div className="cutive-font text-2xl font-bold text-[#253428]">
+            <span>Taste of Madurai</span>
+            <span className="text-[#728175]">.</span>
+          </div>
         </Link>
-
-        {/* Desktop Nav */}
-        <nav className="ml-auto hidden md:flex gap-6">
-          {navItems.map((i) => (
-            <NavLink
-              key={i.to}
-              to={i.to}
-              className={({ isActive }) =>
-                "text-sm transition-colors " +
-                (isActive
-                  ? "text-[#7A1F1F] font-semibold"
-                  : "text-slate-700 hover:text-[#7A1F1F]")
-              }
-            >
-              {i.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        {/* Call to Action (always visible) */}
-        <a
-          href="tel:+46734991206"
-          className="px-3 py-2 rounded-md bg-[#FF6B00] text-white text-sm ml-2"
-        >
-          Call to Order
-        </a>
-
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="ml-auto md:hidden p-2 rounded-md text-slate-700 hover:bg-slate-100"
-        >
-          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
       </div>
 
-      {/* Mobile Dropdown Nav */}
-      {mobileOpen && (
-        <div className="md:hidden bg-white border-t px-4 py-4 space-y-3">
-          {navItems.map((i) => (
+      {/* Nav */}
+      <nav>
+        <ul className="hidden md:flex space-x-6 text-sm cutive-font">
+          <li>
             <NavLink
-              key={i.to}
-              to={i.to}
-              onClick={() => setMobileOpen(false)}
-              className={({ isActive }) =>
-                "block text-sm " +
-                (isActive
-                  ? "text-[#7A1F1F] font-semibold"
-                  : "text-slate-700 hover:text-[#7A1F1F]")
-              }
+              to="/"
+              end
+              className={({ isActive }) => (isActive ? active : base)}
             >
-              {i.label}
+              Home
             </NavLink>
-          ))}
-        </div>
-      )}
+          </li>
+          <li>
+            <NavLink
+              to="/menu"
+              className={({ isActive }) => (isActive ? active : base)}
+            >
+              Menu
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/kki"
+              className={({ isActive }) => (isActive ? active : base)}
+            >
+              Order Us
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/contact"
+              className={({ isActive }) => (isActive ? active : base)}
+            >
+              Contact
+            </NavLink>
+          </li>
+          <li>
+            <a
+              href="https://www.instagram.com/taste_ofmadurai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={base}
+            >
+              Follow Us
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      {/* Button */}
+      <div className="cutive-font bg-[#253428] border border-[#728175]/40 text-[#CDBF9C] font-bold px-4 py-2 rounded-full text-sm shadow-sm">
+        Sat & Sun · 10:00 – 19:00
+      </div>
     </header>
   );
-}
+};
 
 export default Header;
