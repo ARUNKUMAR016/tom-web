@@ -1,432 +1,293 @@
-// src/pages/MenuPage.jsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Search as SearchIcon,
   Leaf,
-  Flame,
-  ChefHat,
-  Sparkles,
-  AlertTriangle,
   ImageOff,
+  Phone,
+  Search,
+  Utensils,
+  ArrowRight,
+  Star,
 } from "lucide-react";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { Button } from "@/components/ui/button";
 import { listFoodItems } from "../../api/foodApi";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { resolveImage } from "@/lib/imageUtils";
 
-/* ===== Brand (match HeroSection exactly) ===== */
-const INK = "#253428";
-const ACCENT = "#CDBF9C";
-const MUTED = "#728175";
-const PAPER = "#F5F1E7";
-const BG = "#F3F4F6";
-
-// env base (same as your admin page)
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-// base categories (food only)
-const BASE_CATEGORIES = ["All", "Starters", "Main Course", "Desserts"];
-
-/* ===== Helpers ===== */
-const currency = (n) => `${n} kr`;
+const currency = (n) =>
+  `kr ${Number(n || 0)
+    .toFixed(2)
+    .replace(".", ",")}`;
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.04 } },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+    },
+  },
 };
+
 const itemVariants = {
-  hidden: { opacity: 0, y: 14, filter: "blur(4px)" },
-  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { type: "spring", stiffness: 260, damping: 24 } },
-  exit: { opacity: 0, y: -10, filter: "blur(4px)", transition: { duration: 0.15 } },
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
 };
-
-// Resolve API image like your admin page
-function resolveImage(url) {
-  if (!url) return "";
-  if (/^https?:\/\//i.test(url)) return url;          // absolute URL
-  if (url.startsWith("/")) return `${API_BASE}${url}`; // /uploads/food.jpg
-  return `${API_BASE}/${url}`;                         // uploads/food.jpg
-}
-
-// Normalize API → UI model (includes imageUrl)
-function normalizeItem(raw) {
-  const id = raw?.id || raw?._id || crypto.randomUUID?.() || String(Math.random());
-  const name = raw?.name || raw?.title || "Untitled";
-  const description = raw?.description || raw?.desc || "";
-  const price = Number(raw?.price ?? raw?.cost ?? 0);
-  const category =
-    raw?.category ||
-    raw?.type ||
-    (raw?.course ? (String(raw.course).toLowerCase().includes("main") ? "Main Course" : "Starters") : "Main Course");
-  const veg =
-    (raw?.veg ?? raw?.isVeg ?? raw?.vegetarian ?? raw?.is_veg) !== false;
-  const spice = Number(raw?.spice ?? raw?.spiceLevel ?? raw?.heat ?? 0);
-
-  // support multiple image keys; make absolute if needed
-  const imageRaw = raw?.imageUrl || raw?.image || raw?.img || raw?.photo || "";
-  const img = resolveImage(imageRaw);
-
-  return { id, name, description, price, category, veg, spice, img };
-}
-
-// Food-only filter for safety
-function isFoodCategory(cat = "") {
-  const c = String(cat).toLowerCase();
-  return !["drink", "drinks", "beverage", "beverages"].some((x) => c.includes(x));
-}
 
 export default function MenuPage() {
-  const [active, setActive] = useState("All");
-  const [query, setQuery] = useState("");
-  const [focus, setFocus] = useState(false);
-
-  const [itemsRaw, setItemsRaw] = useState([]);
+  const { t } = useTranslation();
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [search, setSearch] = useState("");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
-    setError("");
     try {
-      // Try server-side filter; fallback to all
-      const data = await listFoodItems({ category: "food" }).catch(() => listFoodItems());
-      setItemsRaw(Array.isArray(data) ? data : []);
-    } catch (e) {
-      setError(e?.message || "Failed to load items");
-      setItemsRaw([]);
+      const data = await listFoodItems();
+      setItems(data);
+    } catch {
+      setItems([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
-  // Normalize + food only
-  const normalized = useMemo(() => {
-    return itemsRaw.map(normalizeItem).filter((it) => isFoodCategory(it.category));
-  }, [itemsRaw]);
-
-  // Dynamic categories (food only), prettified
-  const categories = useMemo(() => {
-    const found = Array.from(
-      new Set(
-        normalized
-          .map((i) => i.category)
-          .filter(Boolean)
-          .filter(isFoodCategory)
-      )
-    );
-
-    const prettified = found.map((c) => {
-      const lc = String(c).toLowerCase();
-      if (lc.includes("starter") || lc.includes("snack")) return "Starters";
-      if (lc.includes("main")) return "Main Course";
-      if (lc.includes("dessert") || lc.includes("sweet")) return "Desserts";
-      return c;
-    });
-
-    const unique = Array.from(new Set(prettified));
-    const merged = BASE_CATEGORIES.filter((c) => c === "All" || unique.includes(c));
-    return merged.length ? merged : BASE_CATEGORIES;
-  }, [normalized]);
-
-  // Filter by category + search
-  const items = useMemo(() => {
-    const lower = query.trim().toLowerCase();
-    return normalized.filter((item) => {
-      const inCategory =
-        active === "All" ||
-        (item.category &&
-          (active === item.category ||
-            (active === "Starters" && /starter|snack/i.test(item.category)) ||
-            (active === "Main Course" && /main/i.test(item.category)) ||
-            (active === "Desserts" && /dessert|sweet/i.test(item.category))));
-      const inText =
-        !lower ||
-        item.name.toLowerCase().includes(lower) ||
-        item.description.toLowerCase().includes(lower);
-      return inCategory && inText;
-    });
-  }, [active, query, normalized]);
+  const filteredItems = useMemo(() => {
+    return items
+      .filter((item) => {
+        if (activeCategory === "veg") return item.type?.toLowerCase() === "veg";
+        if (activeCategory === "non-veg")
+          return item.type?.toLowerCase() !== "veg";
+        return true;
+      })
+      .filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [items, activeCategory, search]);
 
   return (
-    <main className="relative min-h-screen w-full overflow-hidden" style={{ backgroundColor: BG }}>
-      {/* soft vignette like hero feel */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(60% 40% at 20% 0%, rgba(205,191,156,0.12), transparent), radial-gradient(50% 40% at 100% 20%, rgba(114,129,117,0.10), transparent)",
-        }}
-      />
+    <main className="min-h-screen bg-brand-cream relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-primary/5 rounded-full blur-[100px] -z-0" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-secondary/5 rounded-full blur-[100px] -z-0" />
 
-      <section className="relative z-10 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10 py-10">
-        {/* Title + Search */}
-        <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <ChefHat className="h-6 w-6" style={{ color: ACCENT }} />
-              <h1 className="cutive-font text-3xl sm:text-4xl" style={{ color: INK }}>
-                Our Menu
-              </h1>
-            </div>
-            <p className="cutive-font mt-1 text-sm" style={{ color: MUTED }}>
-              Enjoy Authentic South Indian Flavors.
-            </p>
-          </div>
-
-          {/* Search */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10 py-24 sm:py-32">
+        {/* Header */}
+        <div className="text-center mb-16 sm:mb-24 space-y-4">
           <motion.div
-            layout
-            animate={{ width: focus ? "100%" : "100%" }}
-            className="md:w-[420px]"
-            transition={{ type: "spring", stiffness: 260, damping: 24 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-primary/10 border border-brand-primary/20 mb-4"
           >
-            <div className="relative">
-              <SearchIcon
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
-                style={{ color: MUTED }}
-              />
-              <Input
-                type="text"
-                onFocus={() => setFocus(true)}
-                onBlur={() => setFocus(false)}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search dosa, vada, tea…"
-                className="pl-9 rounded-full border-[#E6E2D9] bg-white/90 shadow-sm placeholder:text-[#9AA69C] focus-visible:ring-0"
-              />
-            </div>
+            <Utensils className="w-4 h-4 text-brand-primary" />
+            <span className="text-xs font-bold text-brand-primary uppercase tracking-[0.2em]">
+              {t("sections.menu.subtitle")}
+            </span>
           </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-6xl sm:text-7xl lg:text-8xl font-display font-bold text-brand-dark uppercase tracking-tighter"
+          >
+            {t("sections.menu.title")}
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-lg text-brand-dark/60 max-w-2xl mx-auto font-sans"
+          >
+            {t("hero.description")}
+          </motion.p>
         </div>
 
-        {/* Error banner */}
-        {error && (
-          <div className="mb-6 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800">
-            <AlertTriangle className="h-4 w-4" />
-            <span className="cutive-font">{error}</span>
-            <button onClick={load} className="ml-auto rounded-full bg-red-100 px-3 py-1 text-sm hover:bg-red-200">
-              Retry
-            </button>
+        {/* Filters & Search - Premium Glass Bar */}
+        <div className="sticky top-24 z-40 mb-12 flex flex-col lg:flex-row items-center gap-6 p-4 sm:p-6 premium-glass rounded-[2rem] shadow-xl border border-white/50">
+          <div className="flex flex-wrap justify-center gap-3 w-full lg:w-auto">
+            {["all", "veg", "non-veg"].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+                  activeCategory === cat
+                    ? "bg-brand-dark text-white shadow-lg scale-105"
+                    : "bg-white/50 text-brand-dark hover:bg-brand-dark/5"
+                }`}
+              >
+                {cat === "all"
+                  ? t("sections.menu.filter_all")
+                  : cat === "veg"
+                  ? "Vegetarian"
+                  : "Non-Vegetarian"}
+              </button>
+            ))}
           </div>
-        )}
 
-        {/* Category Controls */}
-        {/* Mobile: dropdown */}
-        <div className="md:hidden">
-          <Select value={active} onValueChange={setActive}>
-            <SelectTrigger className="cutive-font rounded-full bg-white/90 border-[#E6E2D9] focus:ring-0">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-
-            <SelectContent className="cutive-font">
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat} className="cutive-font">
-                  <span className="flex items-center gap-2">
-                    {cat === "Starters" && <Sparkles className="h-4 w-4" />}
-                    {cat === "Main Course" && <Flame className="h-4 w-4" />}
-                    {cat === "Desserts" && <Leaf className="h-4 w-4 rotate-180" />}
-                    {cat}
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="relative w-full lg:w-96 lg:ml-auto">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-dark/30" />
+            <input
+              type="text"
+              placeholder={t("sections.menu.search_placeholder")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-14 pr-6 py-4 rounded-full bg-white/70 border border-brand-dark/5 focus:outline-none focus:bg-white focus:ring-4 focus:ring-brand-primary/10 transition-all text-sm font-medium"
+            />
+          </div>
         </div>
 
-        {/* Desktop/Tablet: tabs */}
-        <div className="hidden md:block">
-          <Tabs value={active} onValueChange={setActive} className="w-full">
-            <TabsList className="w-full justify-start overflow-x-auto rounded-full h-12 bg-white/90 p-1 shadow-sm border border-[#E6E2D9]">
-              <div className="flex gap-1">
-                {categories.map((cat) => (
-                  <TabsTrigger
-                    key={cat}
-                    value={cat}
-                    className="rounded-full cutive-font text-sm px-4 py-2
-                       data-[state=active]:bg-[#253428] data-[state=active]:text-[#CDBF9C]
-                       data-[state=inactive]:text-[#253428] hover:bg-[#F0EDE5]"
-                  >
-                    <span className="flex items-center gap-2">
-                      {cat === "Starters" && <Sparkles className="h-4 w-4" />}
-                      {cat === "Main Course" && <Flame className="h-4 w-4" />}
-                      {cat === "Desserts" && <Leaf className="h-4 w-4 rotate-180" />}
-                      {cat}
-                    </span>
-                  </TabsTrigger>
-                ))}
-              </div>
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {/* Grid */}
+        {/* Menu grid */}
         {loading ? (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="h-40 w-full rounded-2xl bg-white/70" />
-                <div className="mt-3 h-5 w-2/3 rounded bg-white/70" />
-                <div className="mt-2 h-4 w-3/4 rounded bg-white/60" />
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="animate-pulse rounded-[2.5rem] bg-brand-dark/5 h-[400px]"
+              />
             ))}
           </div>
         ) : (
-          <>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active + "|" + query}
-                variants={containerVariants}
-                initial="hidden"
-                animate="show"
-                exit="hidden"
-                className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-              >
-                {items.map((item) => (
-                  <motion.div key={item.id} variants={itemVariants} className="transform-gpu will-change-transform">
-                    <MenuCard item={item} />
-                  </motion.div>
-                ))}
-              </motion.div>
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10"
+          >
+            <AnimatePresence mode="popLayout">
+              {filteredItems.map((item) => (
+                <MenuTile key={item._id} item={item} />
+              ))}
             </AnimatePresence>
-
-            {items.length === 0 && (
-              <div className="mt-16 flex flex-col items-center text-center">
-                <Sparkles className="h-8 w-8" style={{ color: MUTED }} />
-                <p className="cutive-font mt-3" style={{ color: MUTED }}>
-                  No dishes found. Try another search or category.
-                </p>
-              </div>
-            )}
-          </>
+          </motion.div>
         )}
-      </section>
+
+        {!loading && filteredItems.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-20"
+          >
+            <div className="w-20 h-20 bg-brand-dark/5 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Utensils className="w-10 h-10 text-brand-dark/20" />
+            </div>
+            <h3 className="text-2xl font-display font-bold text-brand-dark uppercase">
+              No match found
+            </h3>
+            <p className="text-brand-dark/60 mb-8">
+              Try adjusting your filters or search terms.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setActiveCategory("all");
+                setSearch("");
+              }}
+              className="rounded-full px-8 py-6 uppercase font-bold tracking-widest border-2 border-brand-dark"
+            >
+              Reset Filters
+            </Button>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Floating Call Button */}
+      <motion.a
+        href="tel:+46734991206"
+        initial={{ scale: 0, rotate: -45 }}
+        animate={{ scale: 1, rotate: 0 }}
+        whileHover={{ scale: 1.1, rotate: 5 }}
+        whileTap={{ scale: 0.9 }}
+        className="fixed bottom-8 right-8 z-50 flex items-center justify-center w-16 h-16 rounded-full bg-brand-primary text-white shadow-2xl shadow-brand-primary/40 hover:bg-brand-dark transition-all duration-300"
+      >
+        <Phone className="h-6 w-6" />
+      </motion.a>
     </main>
   );
 }
 
-/* ===== Menu Card – high-class image treatment ===== */
-function MenuCard({ item }) {
-  const hasImage = Boolean(item.img);
+function MenuTile({ item }) {
+  const [imgOk, setImgOk] = useState(true);
+  const isVeg = item.type?.toLowerCase() === "veg";
 
   return (
     <motion.div
-      whileHover={{ y: -4, scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="group"
-      aria-label={`${item.name} – ${item.description}`}
+      layout
+      variants={itemVariants}
+      exit={{ opacity: 0, scale: 0.8 }}
+      className="group relative bg-white rounded-[2.5rem] overflow-hidden premium-shadow-hover border border-brand-dark/5"
     >
-      <Card
-        className="overflow-hidden rounded-2xl border border-[#E6E2D9] shadow-sm transition-shadow duration-200 group-hover:shadow-lg"
-        style={{ backgroundColor: PAPER }}
-      >
-        {/* Image frame */}
-        <div className="relative">
-          <div className="aspect-[16/10] overflow-hidden">
-            {hasImage ? (
-              <>
-                <img
-                  src={item.img}
-                  alt={item.name}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                  onError={(e) => {
-                    // hide broken image and show fallback (same pattern as admin)
-                    e.currentTarget.style.display = "none";
-                    const fb = e.currentTarget.nextSibling;
-                    if (fb) fb.style.display = "flex";
-                  }}
-                  crossOrigin="anonymous"
-                />
-                {/* Fallback placeholder (hidden initially) */}
-                <div
-                  className="hidden h-full w-full items-center justify-center bg-white/70"
-                  aria-hidden="true"
-                >
-                  <div className="flex items-center gap-2 text-[#9AA69C]">
-                    <ImageOff className="h-5 w-5" />
-                    <span className="cutive-font text-sm">Image unavailable</span>
-                  </div>
-                </div>
-              </>
-            ) : (
-              // No image provided → show elegant placeholder
-              <div className="flex h-full w-full items-center justify-center bg-white/70">
-                <div className="flex items-center gap-2 text-[#9AA69C]">
-                  <ImageOff className="h-5 w-5" />
-                  <span className="cutive-font text-sm">No image</span>
-                </div>
+      <Link to={`/menu/${item._id}`} className="block h-full">
+        <div className="aspect-[1/1] relative overflow-hidden">
+          {imgOk ? (
+            <img
+              src={resolveImage(item.imageUrl)}
+              alt={item.name}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+              onError={() => setImgOk(false)}
+            />
+          ) : (
+            <div className="h-full w-full grid place-items-center bg-brand-cream">
+              <ImageOff className="h-10 w-10 text-brand-dark/10" />
+            </div>
+          )}
+
+          {/* Badge Overlay */}
+          <div className="absolute top-6 left-6 flex flex-col gap-2">
+            <div
+              className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg backdrop-blur-md border border-white/40 ${
+                isVeg ? "bg-emerald-500/90" : "bg-brand-primary/90"
+              }`}
+            >
+              {isVeg ? (
+                <Leaf className="w-5 h-5 text-white" />
+              ) : (
+                <div className="w-2.5 h-2.5 bg-white rounded-full" />
+              )}
+            </div>
+            {item.isChefRecommended && (
+              <div className="w-10 h-10 rounded-full bg-brand-secondary/90 flex items-center justify-center shadow-lg backdrop-blur-md border border-white/40 animate-bounce">
+                <Star className="w-5 h-5 text-white fill-white" />
               </div>
             )}
           </div>
 
-          {/* Vignette + inner frame */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(100%_60%_at_50%_0%,rgba(0,0,0,0.06),transparent)]" />
-          <div className="pointer-events-none absolute inset-0 rounded-none ring-1 ring-white/40" />
-
-          {/* Price chip */}
-          <div className="pointer-events-none absolute right-3 top-3">
-            <div className="cutive-font rounded-full bg-white/90 px-3 py-1 text-sm font-bold shadow backdrop-blur text-[color:#253428]">
-              {currency(item.price)}
+          <div className="absolute bottom-6 right-6">
+            <div className="premium-glass px-4 py-2 rounded-2xl shadow-lg border border-white/40">
+              <span className="font-display font-bold text-brand-dark text-lg">
+                {currency(item.rate)}
+              </span>
             </div>
           </div>
         </div>
 
-        <CardContent className="p-4">
-          <div className="mb-1">
-            <h3 className="cutive-font text-lg" style={{ color: INK }}>
-              {item.name}
-            </h3>
-            <p className="cutive-font mt-1 line-clamp-2 text-sm" style={{ color: MUTED }}>
-              {item.description}
-            </p>
-          </div>
+        <div className="p-8">
+          <h3 className="font-display text-2xl font-bold text-brand-dark group-hover:text-brand-primary transition-colors uppercase tracking-tight mb-2">
+            {item.name}
+          </h3>
 
-          <div className="mt-3 flex items-center justify-between">
-            <div className="flex flex-wrap gap-2">
-              {item.veg ? (
-                <Badge variant="outline" className="gap-1 rounded-full border-emerald-200 text-emerald-700 bg-white/70">
-                  <Leaf className="h-3.5 w-3.5" /> Veg
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="gap-1 rounded-full border-rose-200 text-rose-700 bg-white/70">
-                  <Flame className="h-3.5 w-3.5" /> Non-veg
-                </Badge>
-              )}
-              {item.spice > 0 && (
-                <Badge className="gap-1 rounded-full" style={{ backgroundColor: ACCENT, color: INK }}>
-                  <Flame className="h-3.5 w-3.5" />
-                  {["Mild", "Medium", "Hot"][Math.min(item.spice - 1, 2)]}
-                </Badge>
-              )}
+          <p className="text-sm text-brand-dark/60 font-sans line-clamp-2 mb-6 h-10">
+            {item.description}
+          </p>
+
+          <div className="flex items-center justify-between pt-6 border-t border-brand-dark/5">
+            <span className="text-[10px] font-bold text-brand-dark/40 uppercase tracking-[0.2em] group-hover:text-brand-primary transition-colors">
+              Experience Details
+            </span>
+            <div className="w-10 h-10 rounded-full bg-brand-cream flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all duration-300">
+              <ArrowRight className="w-5 h-5" />
             </div>
-
-            <Button
-              size="sm"
-              className="rounded-full shadow-sm hover:opacity-90"
-              style={{ backgroundColor: INK, color: ACCENT }}
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            >
-              Explore
-            </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </Link>
     </motion.div>
   );
 }

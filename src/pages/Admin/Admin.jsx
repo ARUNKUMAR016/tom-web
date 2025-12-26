@@ -1,18 +1,8 @@
-// src/pages/Admin.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-} from "@/components/ui/card";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 const Admin = () => {
   const [userid, setUserid] = useState("");
@@ -31,6 +21,7 @@ const Admin = () => {
 
   const validate = () => {
     if (!userid.trim()) return "User ID is required.";
+    // Simple email check
     if (!/\S+@\S+\.\S+/.test(userid)) return "Please enter a valid email.";
     if (!password.trim()) return "Password is required.";
     return "";
@@ -42,16 +33,26 @@ const Admin = () => {
     const msg = validate();
     if (msg) {
       setError(msg);
+      toast.error(msg);
       return;
     }
     try {
       setSubmitting(true);
-      await new Promise((r) => setTimeout(r, 400)); // demo delay
+      await new Promise((r) => setTimeout(r, 800)); // demo delay
+      // Hardcoded credentials for demo
       if (userid === "admin@gmail.com" && password === "123") {
-        if (remember) localStorage.setItem("tom_admin_user", userid);
-        navigate("/admin/home");
+        if (remember) {
+          localStorage.setItem("tom_admin_user", userid);
+        } else {
+          // If not remembering, we still need to set it for the session
+          // For now, let's just set it. In a real app we'd use sessionStorage or similar.
+          localStorage.setItem("tom_admin_user", userid);
+        }
+        toast.success("Welcome back, Chef!");
+        navigate("/admin/home", { replace: true });
       } else {
-        setError("Invalid credentials. Try admin@gmail.com / 123 (demo).");
+        setError("Invalid credentials. Try admin@gmail.com / 123");
+        toast.error("Invalid credentials");
       }
     } finally {
       setSubmitting(false);
@@ -59,293 +60,150 @@ const Admin = () => {
   };
 
   return (
-    <div
-      className="min-h-screen relative"
-      style={{
-        // Brand tokens
-        ["--brand-deep"]: "#253428",
-        ["--brand-sage"]: "#728175",
-        ["--brand-sand"] : "#CDBF9C",
-      }}
-    >
-      {/* Background — subtle, premium */}
-      <div
-        className="absolute inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(1100px 600px at 120% -10%, rgba(37,52,40,0.06), transparent 60%), radial-gradient(900px 500px at -10% 120%, rgba(114,129,117,0.08), transparent 60%), linear-gradient(180deg, #f7f3e6 0%, #efe8d4 100%)",
-        }}
-      />
+    <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-brand-dark">
+      {/* Premium Background Effects */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-brand-primary/10 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-brand-secondary/10 blur-[120px]" />
+      </div>
 
-      <div className="mx-auto max-w-6xl px-4 py-10 lg:py-16">
-        <div className="grid gap-10 lg:grid-cols-2 items-stretch">
-          {/* LEFT — Brand / Hero */}
-          <div className="hidden lg:flex">
-            <div
-              className="relative w-full rounded-3xl border shadow-sm p-10 overflow-hidden"
-              style={{
-                background: "rgba(255,255,255,0.75)",
-                backdropFilter: "blur(8px)",
-                borderColor: "var(--brand-sand)",
-              }}
-            >
-              <div className="absolute -right-24 -top-24 h-60 w-60 rotate-12 rounded-full blur-2xl"
-                   style={{ backgroundColor: "rgba(37,52,40,0.10)" }} />
-              <div className="absolute -left-16 bottom-10 h-40 w-40 -rotate-12 rounded-full blur-2xl"
-                   style={{ backgroundColor: "rgba(114,129,117,0.12)" }} />
-
-              <div className="flex items-center gap-4">
-                <img
-                  src="/logo1 (2).svg"
-                  alt="Taste of Madurai Logo"
-                  className="h-16 w-auto rounded-xl"
-                  draggable="false"
-                />
-                <div>
-                  <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight"
-                      style={{ color: "var(--brand-deep)" }}>
-                    Taste of Madurai
-                  </h1>
-                  <p className="text-sm" style={{ color: "rgba(37,52,40,0.75)" }}>
-                    (TOM) • Admin Console
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-8 grid grid-cols-2 gap-4">
-                <div className="rounded-2xl border p-5 hover:shadow-sm transition"
-                     style={{ borderColor: "var(--brand-sand)" }}>
-                  <p className="text-base font-semibold" style={{ color: "var(--brand-deep)" }}>
-                    Curate Menus
-                  </p>
-                  <p className="text-sm mt-1" style={{ color: "rgba(37,52,40,0.75)" }}>
-                    Manage veg, non-veg, vegan & gluten-free tags.
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="text-[11px] px-2 py-1 rounded-full bg-emerald-50 text-emerald-700">
-                      Vegan
-                    </span>
-                    <span className="text-[11px] px-2 py-1 rounded-full bg-indigo-50 text-indigo-700">
-                      Gluten-free
-                    </span>
-                    <span className="text-[11px] px-2 py-1 rounded-full"
-                          style={{ backgroundColor: "#f1f5f9", color: "#334155" }}>
-                      Chef’s special
-                    </span>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border p-5 hover:shadow-sm transition"
-                     style={{ borderColor: "var(--brand-sand)" }}>
-                  <p className="text-base font-semibold" style={{ color: "var(--brand-deep)" }}>
-                    Pricing & Offers
-                  </p>
-                  <p className="text-sm mt-1" style={{ color: "rgba(37,52,40,0.75)" }}>
-                    Edit rates, combos & festive discounts in one place.
-                  </p>
-                  <div className="mt-3 h-2 w-32 rounded"
-                       style={{ backgroundColor: "var(--brand-deep)" }} />
-                </div>
-
-                <div className="rounded-2xl border p-5 hover:shadow-sm transition"
-                     style={{ borderColor: "var(--brand-sand)" }}>
-                  <p className="text-base font-semibold" style={{ color: "var(--brand-deep)" }}>
-                    Kitchen Insights
-                  </p>
-                  <p className="text-sm mt-1" style={{ color: "rgba(37,52,40,0.75)" }}>
-                    Track prep times & dish popularity.
-                  </p>
-                  <div className="mt-3 flex gap-2">
-                    <div className="h-2 w-10 rounded" style={{ backgroundColor: "var(--brand-sage)" }} />
-                    <div className="h-2 w-8 rounded" style={{ backgroundColor: "rgba(37,52,40,0.6)" }} />
-                    <div className="h-2 w-6 rounded" style={{ backgroundColor: "var(--brand-deep)" }} />
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border p-5 hover:shadow-sm transition"
-                     style={{ borderColor: "var(--brand-sand)" }}>
-                  <p className="text-base font-semibold" style={{ color: "var(--brand-deep)" }}>
-                    Secure Access
-                  </p>
-                  <p className="text-sm mt-1" style={{ color: "rgba(37,52,40,0.75)" }}>
-                    Role-based controls & activity audit.
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="text-[11px] px-2 py-1 rounded-full bg-slate-100 text-slate-700">
-                      Manager
-                    </span>
-                    <span className="text-[11px] px-2 py-1 rounded-full text-white"
-                          style={{ backgroundColor: "var(--brand-deep)" }}>
-                      Admin
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8 rounded-2xl border bg-white p-4"
-                   style={{ borderColor: "var(--brand-sand)" }}>
-                <p className="text-xs" style={{ color: "rgba(37,52,40,0.75)" }}>
-                  Tip: Use <span className="font-mono">admin@gmail.com</span> /{" "}
-                  <span className="font-mono">123</span> to explore the panel (demo).
-                </p>
-              </div>
-            </div>
+      <div className="w-full max-w-md px-4 relative z-10 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
+        {/* Logo / Brand */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white mb-6 shadow-2xl p-4">
+            <img
+              src="/logo1.png"
+              alt="Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-
-          {/* RIGHT — Login Card */}
-          <Card
-            className="w-full max-w-xl mx-auto shadow-2xl rounded-3xl"
-            style={{ borderColor: "var(--brand-sand)" }}
-          >
-            <CardHeader className="space-y-3 pt-8">
-              <div className="flex flex-col items-center gap-3">
-                <img
-                  src="/logo1 (2).svg"
-                  alt="TOM Logo"
-                  className="h-14 w-auto"
-                  draggable="false"
-                />
-                <div className="text-center">
-                  <CardTitle
-                    className="text-3xl font-extrabold tracking-tight"
-                    style={{ color: "var(--brand-deep)" }}
-                  >
-                    TOM Admin
-                  </CardTitle>
-                  <CardDescription className="text-base"
-                                   style={{ color: "rgba(37,52,40,0.75)" }}>
-                    Sign in to manage Taste of Madurai
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-
-            <CardContent className="pb-2">
-              {error && (
-                <div
-                  className="mb-4 rounded-lg px-3 py-2 text-sm"
-                  style={{ border: "1px solid #fecaca", backgroundColor: "#fef2f2", color: "#b91c1c" }}
-                >
-                  {error}
-                </div>
-              )}
-
-              <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-                {/* Email */}
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-[15px]" style={{ color: "#334155" }}>
-                    User ID
-                  </Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2"
-                          style={{ color: "#94a3b8" }}>
-                      <Mail size={18} />
-                    </span>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="admin@gmail.com"
-                      className="h-12 pl-10 text-[15px] rounded-xl"
-                      style={{ borderColor: "var(--brand-sand)" }}
-                      value={userid}
-                      onChange={(e) => setUserid(e.target.value)}
-                      autoComplete="username"
-                    />
-                  </div>
-                </div>
-
-                {/* Password */}
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-[15px]" style={{ color: "#334155" }}>
-                    Password
-                  </Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2"
-                          style={{ color: "#94a3b8" }}>
-                      <Lock size={18} />
-                    </span>
-                    <Input
-                      id="password"
-                      type={showPass ? "text" : "password"}
-                      placeholder="••••••••"
-                      className="h-12 pl-10 pr-12 text-[15px] rounded-xl"
-                      style={{ borderColor: "var(--brand-sand)" }}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      autoComplete="current-password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPass((s) => !s)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2"
-                      style={{ color: "#64748b" }}
-                      aria-label={showPass ? "Hide password" : "Show password"}
-                    >
-                      {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Remember & Forgot */}
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2 text-sm" style={{ color: "#334155" }}>
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-slate-300"
-                      checked={remember}
-                      onChange={(e) => setRemember(e.target.checked)}
-                    />
-                    Remember me
-                  </label>
-                  <a
-                    href="#"
-                    onClick={(e) => e.preventDefault()}
-                    className="text-sm hover:underline"
-                    style={{ color: "var(--brand-deep)" }}
-                    title="Forgot password"
-                  >
-                    Forgot password?
-                  </a>
-                </div>
-
-                <Button
-                  className="w-full h-12 text-base font-semibold rounded-xl"
-                  style={{ backgroundColor: "var(--brand-deep)", color: "#fff" }}
-                  disabled={submitting}
-                  type="submit"
-                >
-                  {submitting ? "Signing in…" : "Login"}
-                </Button>
-              </form>
-            </CardContent>
-
-            <CardFooter className="flex flex-col gap-3 pb-8">
-              <div
-                className="rounded-xl px-4 py-3 text-sm"
-                style={{ backgroundColor: "#f8fafc", border: "1px solid var(--brand-sand)", color: "#334155" }}
-              >
-                <span className="font-medium" style={{ color: "var(--brand-deep)" }}>Chef’s Note:</span>{" "}
-                Add a “Today’s Special” every evening for the dinner crowd.
-              </div>
-              <p className="text-[11px] text-center" style={{ color: "#64748b" }}>
-                By continuing, you agree to our{" "}
-                <a href="#" className="underline hover:opacity-80" style={{ color: "var(--brand-deep)" }}>Terms</a> and{" "}
-                <a href="#" className="underline hover:opacity-80" style={{ color: "var(--brand-deep)" }}>Privacy Policy</a>.
-              </p>
-            </CardFooter>
-          </Card>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-10 flex flex-col items-center gap-2 text-sm"
-             style={{ color: "rgba(37,52,40,0.8)" }}>
-          <div className="h-px w-48"
-               style={{ backgroundColor: "var(--brand-sand)" }} />
-          <p>
-            © {new Date().getFullYear()} Taste of Madurai (TOM) • Crafted with{" "}
-            <span style={{ color: "var(--brand-deep)" }}>♥</span>
+          <h1 className="text-4xl font-display font-bold text-white uppercase tracking-tight mb-2">
+            Admin <span className="text-brand-primary">Portal</span>
+          </h1>
+          <p className="text-white/60 font-sans text-sm">
+            Secure access for Taste of Madurai staff
           </p>
         </div>
+
+        {/* Login Card */}
+        <div className="bg-white rounded-[2rem] p-8 sm:p-10 shadow-2xl relative overflow-hidden group border border-white/10">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm text-center font-medium animate-pulse">
+                {error}
+              </div>
+            )}
+
+            {/* Email */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-dark/60 uppercase tracking-widest ml-1">
+                User ID
+              </label>
+              <div className="relative group/input">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-dark/30 group-focus-within/input:text-brand-primary transition-colors">
+                  <Mail className="h-5 w-5" />
+                </div>
+                <input
+                  type="email"
+                  value={userid}
+                  onChange={(e) => setUserid(e.target.value)}
+                  placeholder="admin@gmail.com"
+                  className="w-full bg-brand-cream/50 border border-brand-dark/5 rounded-xl py-4 pl-12 pr-4 text-brand-dark placeholder-brand-dark/30 font-medium focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-brand-dark/60 uppercase tracking-widest ml-1">
+                Password
+              </label>
+              <div className="relative group/input">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-dark/30 group-focus-within/input:text-brand-primary transition-colors">
+                  <Lock className="h-5 w-5" />
+                </div>
+                <input
+                  type={showPass ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-brand-cream/50 border border-brand-dark/5 rounded-xl py-4 pl-12 pr-12 text-brand-dark placeholder-brand-dark/30 font-medium focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-dark/30 hover:text-brand-dark transition-colors"
+                >
+                  {showPass ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Options */}
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <div
+                  className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
+                    remember
+                      ? "bg-brand-primary border-brand-primary"
+                      : "border-brand-dark/20 group-hover:border-brand-primary"
+                  }`}
+                >
+                  {remember && (
+                    <div className="w-2.5 h-2.5 bg-white rounded-[2px]" />
+                  )}
+                </div>
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="hidden"
+                />
+                <span className="text-brand-dark/60 font-medium group-hover:text-brand-dark transition-colors">
+                  Remember me
+                </span>
+              </label>
+              <button
+                type="button"
+                className="text-brand-primary font-bold hover:text-brand-secondary transition-colors"
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            {/* Submit */}
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="w-full h-14 bg-brand-dark text-white font-bold rounded-xl hover:bg-brand-primary transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2 uppercase tracking-widest text-sm"
+            >
+              {submitting ? (
+                "Signing in..."
+              ) : (
+                <>
+                  Access Dashboard <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </form>
+
+          {/* Footer Info */}
+          <div className="mt-8 pt-6 border-t border-brand-dark/5 text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-dark/5 text-xs text-brand-dark/40 font-bold uppercase tracking-widest">
+              <ShieldCheck className="h-3 w-3 text-brand-primary" />
+              <span>Secure System v2.1</span>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-center text-white/20 text-xs mt-8 font-medium">
+          &copy; {new Date().getFullYear()} Taste of Madurai. All rights
+          reserved.
+        </p>
       </div>
     </div>
   );

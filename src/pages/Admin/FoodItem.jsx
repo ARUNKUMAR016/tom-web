@@ -1,8 +1,8 @@
-// src/pages/FoodItem.jsx
+// src/pages/Admin/FoodItem.jsx
 import React, { useState, useMemo } from "react";
 import { createFoodItem } from "../../api/foodApi";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload, X, Check, Flame, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 const MAX_IMAGE_MB = 5;
@@ -16,13 +16,6 @@ const CATEGORIES = [
 ];
 
 const SPICE_LABELS = ["None", "Mild", "Medium", "Hot", "Very Hot", "Fire"];
-
-// Brand tokens
-const brand = {
-  deep: "#253428",   // primary dark
-  sage: "#728175",   // accent
-  sand: "#CDBF9C",   // light
-};
 
 const FoodItem = () => {
   const [form, setForm] = useState({
@@ -50,7 +43,9 @@ const FoodItem = () => {
     const trimmed = ingredientInput.trim();
     if (!trimmed) return;
     if (
-      !form.ingredients.map((i) => i.toLowerCase()).includes(trimmed.toLowerCase())
+      !form.ingredients
+        .map((i) => i.toLowerCase())
+        .includes(trimmed.toLowerCase())
     ) {
       setForm((prev) => ({
         ...prev,
@@ -85,7 +80,8 @@ const FoodItem = () => {
     const e = {};
     if (!form.name.trim()) e.name = "Name is required.";
     if (!form.image) e.image = "Image is required.";
-    if (form.rate === "" || Number(form.rate) <= 0) e.rate = "Rate must be positive.";
+    if (form.rate === "" || Number(form.rate) <= 0)
+      e.rate = "Rate must be positive.";
     if (form.description.trim().length < 10)
       e.description = "Description should be at least 10 characters.";
     if (form.ingredients.length === 0)
@@ -165,37 +161,22 @@ const FoodItem = () => {
   const spiceText = SPICE_LABELS[form.spiceLevel] ?? "None";
 
   const spiceBar = useMemo(() => {
-    // 6 segments (0..5). Fill up to spiceLevel
     return Array.from({ length: 6 }, (_, i) => i <= form.spiceLevel);
   }, [form.spiceLevel]);
 
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        ["--brand-deep"]: brand.deep,
-        ["--brand-sage"]: brand.sage,
-        ["--brand-sand"]: brand.sand,
-      }}
-    >
-      {/* Page Header (replaces NavHeader) */}
-      <header
-        className="flex items-center justify-between gap-4 px-5 py-4 border-b"
-        style={{ backgroundColor: "var(--brand-sand)", borderColor: "#e6dec7" }}
-      >
+    <div className="min-h-[calc(100vh-4rem)] pb-20">
+      {/* Page Header */}
+      <header className="flex items-center justify-between gap-4 py-6">
         <div className="flex items-center gap-3">
-          <div
-            className="flex h-9 w-9 items-center justify-center rounded-lg"
-            style={{ backgroundColor: "#ffffffa8", border: "1px solid #e6dec7" }}
-          >
-            {/* simple dot/emoji as identity mark */}
-            <span style={{ color: "var(--brand-deep)", fontWeight: 700 }}>＋</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-primary/10 text-brand-primary border border-brand-primary/20">
+            <Plus className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold" style={{ color: "var(--brand-deep)" }}>
+            <h1 className="text-2xl font-bold text-brand-dark font-cutive">
               Add Food Item
             </h1>
-            <p className="text-xs" style={{ color: "rgba(37,52,40,0.7)" }}>
+            <p className="text-sm text-brand-dark/60">
               Create a new dish for Taste of Madurai menu
             </p>
           </div>
@@ -203,13 +184,7 @@ const FoodItem = () => {
 
         <Link
           to="/admin/home"
-          className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition"
-          style={{
-            backgroundColor: "rgba(255,255,255,0.6)",
-            border: "1px solid #e6dec7",
-            color: "var(--brand-deep)",
-          }}
-          title="Back to Admin Home"
+          className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all bg-white border border-brand-dark/10 text-brand-dark/60 hover:text-brand-dark hover:border-brand-dark/20 shadow-sm"
         >
           <ArrowLeft className="h-4 w-4" />
           Home
@@ -217,76 +192,68 @@ const FoodItem = () => {
       </header>
 
       {/* Content */}
-      <div
-        className="p-8"
-        style={{ background: "linear-gradient(180deg, #f7f3e6 0%, #efe8d4 100%)" }}
-      >
-        <div className="mx-auto max-w-6xl grid gap-8 lg:grid-cols-2">
-          {/* Form */}
-          <form
-            onSubmit={onSubmit}
-            className="bg-white rounded-3xl shadow-xl p-8 space-y-6"
-            style={{ border: "1px solid var(--brand-sand)" }}
-          >
-            <h2 className="text-2xl font-bold" style={{ color: "#0f172a" }}>
-              Add Food Item
-            </h2>
+      <div className="grid gap-8 lg:grid-cols-2">
+        {/* Form */}
+        <form
+          onSubmit={onSubmit}
+          className="bg-white rounded-3xl p-8 space-y-6 shadow-sm border border-brand-dark/5"
+        >
+          <h2 className="text-xl font-bold text-brand-dark font-cutive border-b border-brand-dark/5 pb-4">
+            Item Details
+          </h2>
 
-            {serverError && (
-              <div
-                className="text-sm rounded-xl px-4 py-2"
-                style={{ color: "#b91c1c", backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}
-              >
-                {serverError}
-              </div>
+          {serverError && (
+            <div className="text-sm rounded-xl px-4 py-3 bg-red-50 border border-red-100 text-red-600">
+              {serverError}
+            </div>
+          )}
+
+          {/* Name */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-brand-dark/60 uppercase tracking-wider">
+              Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.name}
+              onChange={(e) => setField("name", e.target.value)}
+              placeholder="Eg: Paneer Butter Masala"
+              className="w-full rounded-xl px-4 py-3 text-sm bg-brand-cream/50 border border-brand-dark/10 text-brand-dark placeholder-brand-dark/30 focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/50 transition-all font-medium"
+            />
+            {errors.name && (
+              <p className="text-xs text-red-500 font-medium">{errors.name}</p>
             )}
+          </div>
 
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium" style={{ color: "#334155" }}>
-                Name<span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) => setField("name", e.target.value)}
-                placeholder="Eg: Paneer Butter Masala"
-                className="mt-1 h-12 w-full rounded-xl px-4 text-[15px] outline-none"
-                style={{ border: "1px solid var(--brand-sand)" }}
-              />
-              {errors.name && (
-                <p className="text-xs" style={{ color: "#b91c1c" }}>{errors.name}</p>
-              )}
-            </div>
+          {/* Description */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-brand-dark/60 uppercase tracking-wider">
+              Description <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              rows={3}
+              value={form.description}
+              onChange={(e) => setField("description", e.target.value)}
+              placeholder="Short, tasty description…"
+              className="w-full rounded-xl px-4 py-3 text-sm bg-brand-cream/50 border border-brand-dark/10 text-brand-dark placeholder-brand-dark/30 focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/50 transition-all resize-none font-medium"
+            />
+            {errors.description && (
+              <p className="text-xs text-red-500 font-medium">
+                {errors.description}
+              </p>
+            )}
+          </div>
 
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium" style={{ color: "#334155" }}>
-                Description<span className="text-red-500">*</span>
-              </label>
-              <textarea
-                rows={2}
-                value={form.description}
-                onChange={(e) => setField("description", e.target.value)}
-                placeholder="Short, tasty description…"
-                className="mt-1 w-full rounded-xl px-4 py-3 text-[15px] outline-none"
-                style={{ border: "1px solid var(--brand-sand)" }}
-              />
-              {errors.description && (
-                <p className="text-xs" style={{ color: "#b91c1c" }}>{errors.description}</p>
-              )}
-            </div>
-
-            {/* Category */}
-            <div>
-              <label className="block text-sm font-medium" style={{ color: "#334155" }}>
-                Category<span className="text-red-500">*</span>
-              </label>
+          {/* Category */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-brand-dark/60 uppercase tracking-wider">
+              Category <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
               <select
                 value={form.category}
                 onChange={(e) => setField("category", e.target.value)}
-                className="mt-1 h-12 w-full rounded-xl bg-white px-4 text-[15px] outline-none"
-                style={{ border: "1px solid var(--brand-sand)" }}
+                className="w-full rounded-xl px-4 py-3 text-sm bg-brand-cream/50 border border-brand-dark/10 text-brand-dark focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/50 transition-all appearance-none font-medium cursor-pointer"
               >
                 {CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>
@@ -294,367 +261,487 @@ const FoodItem = () => {
                   </option>
                 ))}
               </select>
-              {errors.category && (
-                <p className="text-xs" style={{ color: "#b91c1c" }}>{errors.category}</p>
-              )}
-            </div>
-
-            {/* Image */}
-            <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: "#334155" }}>
-                Image <span className="text-red-500">*</span>
-              </label>
-              <label
-                htmlFor="image"
-                className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition"
-                style={{ borderColor: "var(--brand-sand)", backgroundColor: "#f8fafc" }}
-                title="Upload image"
-              >
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-brand-dark/40">
                 <svg
-                  className="w-10 h-10 mb-2"
+                  className="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2"
                   viewBox="0 0 24 24"
-                  style={{ color: "var(--brand-deep)" }}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 15a4 4 0 014-4h1m4-4h.01M12 20h9" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
-                <p className="text-sm">
-                  <span className="font-medium" style={{ color: "var(--brand-deep)" }}>
-                    Click to upload
-                  </span>{" "}
-                  or drag & drop
-                </p>
-                <p className="text-xs" style={{ color: "#64748b" }}>
-                  PNG, JPG, JPEG, WEBP up to {MAX_IMAGE_MB}MB
-                </p>
-                <input
-                  id="image"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleImageChange(e.target.files?.[0] || null)}
-                />
-              </label>
-
-              {form.image && (
-                <p className="mt-2 text-xs" style={{ color: "#334155" }}>
-                  Selected: <span className="font-medium">{form.image.name}</span>
-                </p>
-              )}
-              {errors.image && (
-                <p className="mt-1 text-xs" style={{ color: "#b91c1c" }}>{errors.image}</p>
-              )}
-            </div>
-
-            {/* Ingredients */}
-            <div>
-              <label className="block text-sm font-medium" style={{ color: "#334155" }}>
-                Ingredients<span className="text-red-500">*</span>
-              </label>
-              <div className="mt-1 flex gap-2">
-                <input
-                  type="text"
-                  value={ingredientInput}
-                  onChange={(e) => setIngredientInput(e.target.value)}
-                  onKeyDown={onIngredientKeyDown}
-                  placeholder="Type an ingredient and press Enter"
-                  className="flex-1 h-12 rounded-xl px-4 text-[15px] outline-none"
-                  style={{ border: "1px solid var(--brand-sand)" }}
-                />
-                <button
-                  type="button"
-                  onClick={addIngredient}
-                  className="h-12 rounded-xl px-4 text-white font-medium transition"
-                  style={{ backgroundColor: "var(--brand-deep)" }}
-                >
-                  Add
-                </button>
-              </div>
-              {errors.ingredients && (
-                <p className="text-xs" style={{ color: "#b91c1c" }}>{errors.ingredients}</p>
-              )}
-              {form.ingredients.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {form.ingredients.map((ing) => (
-                    <span
-                      key={ing}
-                      className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs"
-                      style={{ backgroundColor: "#fff7ed", border: "1px solid var(--brand-sand)", color: "#334155" }}
-                    >
-                      {ing}
-                      <button
-                        type="button"
-                        onClick={() => removeIngredient(ing)}
-                        className="rounded-full w-5 h-5 grid place-items-center"
-                        style={{ backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0" }}
-                        title="Remove"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Rate */}
-            <div>
-              <label className="block text-sm font-medium" style={{ color: "#334155" }}>
-                Rate (kr)<span className="text-red-500">*</span>
-              </label>
-              <div className="mt-1 relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#64748b" }}>
-                  kr
-                </span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={form.rate}
-                  onChange={(e) => setField("rate", e.target.value)}
-                  placeholder="Eg: 179.00"
-                  className="h-12 w-full rounded-xl pl-10 pr-4 text-[15px] outline-none"
-                  style={{ border: "1px solid var(--brand-sand)" }}
-                />
-              </div>
-              {errors.rate && (
-                <p className="text-xs" style={{ color: "#b91c1c" }}>{errors.rate}</p>
-              )}
-            </div>
-
-            {/* Type */}
-            <div>
-              <span className="block text-sm font-medium" style={{ color: "#334155" }}>
-                Type<span className="text-red-500">*</span>
-              </span>
-              <div className="mt-2 flex gap-6" style={{ color: "#334155" }}>
-                <label className="inline-flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="type"
-                    value="veg"
-                    checked={form.type === "veg"}
-                    onChange={() => onTypeChange("veg")}
-                  />
-                  Veg
-                </label>
-                <label className="inline-flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="type"
-                    value="nonveg"
-                    checked={form.type === "nonveg"}
-                    onChange={() => onTypeChange("nonveg")}
-                  />
-                  Non-veg
-                </label>
               </div>
             </div>
-
-            {/* Vegan + Gluten-free */}
-            <div className="grid sm:grid-cols-2 gap-3" style={{ color: "#334155" }}>
-              <label className="inline-flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={form.vegan}
-                  onChange={(e) => setField("vegan", e.target.checked)}
-                  disabled={form.type === "nonveg"}
-                />
-                <span className={`text-sm ${form.type === "nonveg" ? "text-slate-400" : ""}`}>
-                  Vegan {form.type === "nonveg" ? "(disabled for Non-veg)" : ""}
-                </span>
-              </label>
-
-              <label className="inline-flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={form.glutenFree}
-                  onChange={(e) => setField("glutenFree", e.target.checked)}
-                />
-                <span className="text-sm">Gluten-free</span>
-              </label>
-            </div>
-            {errors.vegan && (
-              <p className="text-xs" style={{ color: "#b91c1c" }}>{errors.vegan}</p>
+            {errors.category && (
+              <p className="text-xs text-red-500 font-medium">
+                {errors.category}
+              </p>
             )}
+          </div>
 
-            {/* Spice Level */}
-            <div>
-              <label className="block text-sm font-medium" style={{ color: "#334155" }}>
-                Spice Level
-              </label>
-              <div className="mt-2">
-                <input
-                  type="range"
-                  min="0"
-                  max="5"
-                  step="1"
-                  value={form.spiceLevel}
-                  onChange={(e) => setField("spiceLevel", Number(e.target.value))}
-                  className="w-full"
-                />
-                <div className="mt-2 flex items-center justify-between text-xs" style={{ color: "#64748b" }}>
-                  <span>None</span><span>Mild</span><span>Medium</span>
-                  <span>Hot</span><span>Very Hot</span><span>Fire</span>
-                </div>
-
-                {/* Pepper heat bar */}
-                <div className="mt-3 flex gap-1">
-                  {spiceBar.map((filled, idx) => (
-                    <div
-                      key={idx}
-                      className={`h-2 flex-1 rounded ${filled ? "" : "bg-slate-200"}`}
-                      style={
-                        filled
-                          ? {
-                              background:
-                                idx < 2
-                                  ? "linear-gradient(90deg, #86efac, #22c55e)"
-                                  : idx < 4
-                                  ? "linear-gradient(90deg, #fde047, #fb923c)"
-                                  : "linear-gradient(90deg, #fb923c, #dc2626)",
-                            }
-                          : undefined
-                      }
-                    />
-                  ))}
-                </div>
-                <p className="mt-2 text-sm font-medium" style={{ color: "#334155" }}>
-                  Selected: <span style={{ color: "var(--brand-sage)" }}>{spiceText}</span>
-                </p>
+          {/* Image */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-brand-dark/60 uppercase tracking-wider">
+              Image <span className="text-red-500">*</span>
+            </label>
+            <label
+              htmlFor="image"
+              className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-brand-dark/10 rounded-xl cursor-pointer hover:bg-brand-cream/50 hover:border-brand-primary/30 transition-all group bg-white"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-cream mb-3 group-hover:scale-110 transition-transform">
+                <Upload className="h-5 w-5 text-brand-dark/40 group-hover:text-brand-primary transition-colors" />
               </div>
-              {errors.spiceLevel && (
-                <p className="text-xs" style={{ color: "#b91c1c" }}>{errors.spiceLevel}</p>
-              )}
-            </div>
+              <p className="text-sm text-brand-dark/60 group-hover:text-brand-dark transition-colors font-medium">
+                <span className="text-brand-primary">Click to upload</span> or
+                drag & drop
+              </p>
+              <p className="text-xs text-brand-dark/30 mt-1">
+                PNG, JPG, WEBP up to {MAX_IMAGE_MB}MB
+              </p>
+              <input
+                id="image"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImageChange(e.target.files?.[0] || null)}
+              />
+            </label>
 
-            {/* Actions */}
-            <div className="pt-2 flex items-center gap-3">
-              <button
-                type="submit"
-                disabled={loading}
-                className="h-12 rounded-xl px-6 text-[15px] font-semibold transition disabled:opacity-60"
-                style={{ backgroundColor: "var(--brand-deep)", color: "#fff" }}
-              >
-                {loading ? "Saving..." : "Save Item"}
-              </button>
+            {form.image && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 text-green-700 text-sm font-medium border border-green-100">
+                <Check className="h-4 w-4" />
+                Selected: {form.image.name}
+              </div>
+            )}
+            {errors.image && (
+              <p className="text-xs text-red-500 font-medium">{errors.image}</p>
+            )}
+          </div>
+
+          {/* Ingredients */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-brand-dark/60 uppercase tracking-wider">
+              Ingredients <span className="text-red-500">*</span>
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={ingredientInput}
+                onChange={(e) => setIngredientInput(e.target.value)}
+                onKeyDown={onIngredientKeyDown}
+                placeholder="Type ingredient & press Enter"
+                className="flex-1 rounded-xl px-4 py-3 text-sm bg-brand-cream/50 border border-brand-dark/10 text-brand-dark placeholder-brand-dark/30 focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/50 transition-all font-medium"
+              />
               <button
                 type="button"
-                onClick={() => {
-                  setForm({
-                    name: "",
-                    description: "",
-                    image: null,
-                    rate: "",
-                    type: "veg",
-                    vegan: false,
-                    glutenFree: false,
-                    ingredients: [],
-                    category: "main_course",
-                    spiceLevel: 0,
-                  });
-                  setIngredientInput("");
-                  setErrors({});
-                  setServerError("");
-                }}
-                className="h-12 rounded-xl px-6 text-[15px] transition"
-                style={{ backgroundColor: "#fff", border: "1px solid #e2e8f0", color: "#334155" }}
+                onClick={addIngredient}
+                className="px-6 rounded-xl bg-brand-dark text-white font-bold text-sm hover:bg-brand-primary transition-colors shadow-lg hover:shadow-xl"
               >
-                Reset
+                Add
               </button>
             </div>
-          </form>
-
-          {/* Preview */}
-          <div
-            className="bg-white rounded-3xl shadow-xl p-8"
-            style={{ border: "1px solid var(--brand-sand)" }}
-          >
-            <h3 className="text-xl font-semibold mb-4" style={{ color: "#0f172a" }}>
-              Preview
-            </h3>
-            <div className="rounded-2xl p-6" style={{ border: "1px solid var(--brand-sand)" }}>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-                {/* Image Preview */}
-                <div className="flex-shrink-0">
-                  {form.image ? (
-                    <img
-                      src={URL.createObjectURL(form.image)}
-                      alt="Preview"
-                      className="w-32 h-32 rounded-2xl object-cover border shadow-md"
-                      style={{ borderColor: "var(--brand-sand)" }}
-                    />
-                  ) : (
-                    <div
-                      className="w-32 h-32 flex items-center justify-center rounded-2xl border-2 border-dashed text-sm"
-                      style={{ borderColor: "var(--brand-sand)", color: "#94a3b8" }}
+            {errors.ingredients && (
+              <p className="text-xs text-red-500 font-medium">
+                {errors.ingredients}
+              </p>
+            )}
+            {form.ingredients.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-2">
+                {form.ingredients.map((ing) => (
+                  <span
+                    key={ing}
+                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-brand-cream border border-brand-dark/5 text-brand-dark/80"
+                  >
+                    {ing}
+                    <button
+                      type="button"
+                      onClick={() => removeIngredient(ing)}
+                      className="hover:text-red-500 transition-colors bg-white rounded-full p-0.5"
+                      title="Remove"
                     >
-                      No image
-                    </div>
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Rate */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-brand-dark/60 uppercase tracking-wider">
+              Rate (SEK) <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-dark/40 text-sm font-bold">
+                kr
+              </span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.rate}
+                onChange={(e) => setField("rate", e.target.value)}
+                placeholder="Eg: 179.00"
+                className="w-full rounded-xl pl-10 pr-4 py-3 text-sm bg-brand-cream/50 border border-brand-dark/10 text-brand-dark placeholder-brand-dark/30 focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/50 transition-all font-bold"
+              />
+            </div>
+            {errors.rate && (
+              <p className="text-xs text-red-500 font-medium">{errors.rate}</p>
+            )}
+          </div>
+
+          {/* Type */}
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-brand-dark/60 uppercase tracking-wider block">
+              Type <span className="text-red-500">*</span>
+            </span>
+            <div className="flex gap-4">
+              <label
+                className={`flex-1 inline-flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                  form.type === "veg"
+                    ? "bg-emerald-50 border-emerald-200 shadow-sm"
+                    : "bg-white border-brand-dark/10 hover:border-brand-dark/20"
+                }`}
+              >
+                <div
+                  className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
+                    form.type === "veg"
+                      ? "border-emerald-500"
+                      : "border-brand-dark/20"
+                  }`}
+                >
+                  {form.type === "veg" && (
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                   )}
                 </div>
+                <input
+                  type="radio"
+                  name="type"
+                  value="veg"
+                  checked={form.type === "veg"}
+                  onChange={() => onTypeChange("veg")}
+                  className="hidden"
+                />
+                <span
+                  className={`text-sm font-bold ${
+                    form.type === "veg"
+                      ? "text-emerald-700"
+                      : "text-brand-dark/60"
+                  }`}
+                >
+                  Vegetarian
+                </span>
+              </label>
 
-                {/* Item Info */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h4 className="text-2xl font-semibold" style={{ color: "#0f172a" }}>
-                      {form.name || "Item name"}
-                    </h4>
-                    <span
-                      className="text-xs px-2 py-1 rounded-full"
-                      style={{
-                        backgroundColor: form.type === "veg" ? "#dcfce7" : "#fee2e2",
-                        color: form.type === "veg" ? "#15803d" : "#b91c1c",
-                      }}
-                    >
-                      {badge}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <span
-                      className="text-xs px-2 py-1 rounded-full"
-                      style={{ backgroundColor: "#f1f5f9", color: "#334155" }}
-                    >
-                      {CATEGORIES.find((c) => c.value === form.category)?.label || "Main Course"}
-                    </span>
-                    {form.vegan && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ backgroundColor: "#d1fae5", color: "#065f46" }}>
-                        Vegan
-                      </span>
-                    )}
-                    {form.glutenFree && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ backgroundColor: "#e0e7ff", color: "#4338ca" }}>
-                        Gluten-free
-                      </span>
-                    )}
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ backgroundColor: "#fff7ed", color: "#9a3412" }}>
-                      Spice: {SPICE_LABELS[form.spiceLevel]}
-                    </span>
-                  </div>
-
-                  <p className="text-sm" style={{ color: "#475569" }}>
-                    {form.description || "Description will appear here…"}
-                  </p>
-
-                  <div className="mt-3 flex items-center justify-between">
-                    <div className="text-3xl font-bold" style={{ color: "#0f172a" }}>
-                      {form.rate
-                        ? new Intl.NumberFormat("sv-SE", {
-                            style: "currency",
-                            currency: "SEK",
-                          }).format(Number(form.rate))
-                        : "0,00 kr"}
-                    </div>
-                  </div>
+              <label
+                className={`flex-1 inline-flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                  form.type === "nonveg"
+                    ? "bg-rose-50 border-rose-200 shadow-sm"
+                    : "bg-white border-brand-dark/10 hover:border-brand-dark/20"
+                }`}
+              >
+                <div
+                  className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
+                    form.type === "nonveg"
+                      ? "border-rose-500"
+                      : "border-brand-dark/20"
+                  }`}
+                >
+                  {form.type === "nonveg" && (
+                    <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                  )}
                 </div>
+                <input
+                  type="radio"
+                  name="type"
+                  value="nonveg"
+                  checked={form.type === "nonveg"}
+                  onChange={() => onTypeChange("nonveg")}
+                  className="hidden"
+                />
+                <span
+                  className={`text-sm font-bold ${
+                    form.type === "nonveg"
+                      ? "text-rose-700"
+                      : "text-brand-dark/60"
+                  }`}
+                >
+                  Non-Veg
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* Vegan + Gluten-free */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            <label
+              className={`inline-flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                form.vegan
+                  ? "bg-emerald-50 border-emerald-200 shadow-sm"
+                  : "bg-white border-brand-dark/10"
+              } ${
+                form.type === "nonveg"
+                  ? "opacity-50 cursor-not-allowed bg-gray-50"
+                  : "hover:border-brand-dark/20"
+              }`}
+            >
+              <div
+                className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                  form.vegan
+                    ? "bg-emerald-500 border-emerald-500"
+                    : "border-brand-dark/20 bg-white"
+                }`}
+              >
+                {form.vegan && <Check className="w-3.5 h-3.5 text-white" />}
+              </div>
+              <input
+                type="checkbox"
+                checked={form.vegan}
+                onChange={(e) => setField("vegan", e.target.checked)}
+                disabled={form.type === "nonveg"}
+                className="hidden"
+              />
+              <span
+                className={`text-sm font-bold ${
+                  form.vegan ? "text-emerald-700" : "text-brand-dark/60"
+                }`}
+              >
+                Vegan
+              </span>
+            </label>
+
+            <label
+              className={`inline-flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                form.glutenFree
+                  ? "bg-blue-50 border-blue-200 shadow-sm"
+                  : "bg-white border-brand-dark/10 hover:border-brand-dark/20"
+              }`}
+            >
+              <div
+                className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                  form.glutenFree
+                    ? "bg-blue-500 border-blue-500"
+                    : "border-brand-dark/20 bg-white"
+                }`}
+              >
+                {form.glutenFree && (
+                  <Check className="w-3.5 h-3.5 text-white" />
+                )}
+              </div>
+              <input
+                type="checkbox"
+                checked={form.glutenFree}
+                onChange={(e) => setField("glutenFree", e.target.checked)}
+                className="hidden"
+              />
+              <span
+                className={`text-sm font-bold ${
+                  form.glutenFree ? "text-blue-700" : "text-brand-dark/60"
+                }`}
+              >
+                Gluten-free
+              </span>
+            </label>
+          </div>
+          {errors.vegan && (
+            <p className="text-xs text-red-500 font-medium">{errors.vegan}</p>
+          )}
+
+          {/* Spice Level */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-brand-dark/60 uppercase tracking-wider">
+              Spice Level
+            </label>
+            <div className="bg-brand-cream/30 rounded-xl p-4 border border-brand-dark/5">
+              <input
+                type="range"
+                min="0"
+                max="5"
+                step="1"
+                value={form.spiceLevel}
+                onChange={(e) => setField("spiceLevel", Number(e.target.value))}
+                className="w-full accent-brand-secondary cursor-grab active:cursor-grabbing"
+              />
+              <div className="mt-3 flex gap-1 h-2">
+                {spiceBar.map((filled, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex-1 rounded-full transition-colors ${
+                      filled ? "" : "bg-brand-dark/10"
+                    }`}
+                    style={
+                      filled
+                        ? {
+                            background:
+                              idx < 2
+                                ? "#4ade80" // green
+                                : idx < 4
+                                ? "#facc15" // yellow
+                                : "#ef4444", // red
+                          }
+                        : undefined
+                    }
+                  />
+                ))}
+              </div>
+              <div className="mt-2 flex justify-between items-center">
+                <span className="text-xs text-brand-dark/40 font-bold">
+                  None
+                </span>
+                <span className="text-sm font-bold text-brand-dark flex items-center gap-1">
+                  {form.spiceLevel > 0 && (
+                    <Flame className="w-3 h-3 text-brand-secondary fill-brand-secondary" />
+                  )}
+                  {spiceText}
+                </span>
+                <span className="text-xs text-brand-dark/40 font-bold">
+                  Fire
+                </span>
+              </div>
+            </div>
+            {errors.spiceLevel && (
+              <p className="text-xs text-red-500 font-medium">
+                {errors.spiceLevel}
+              </p>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="pt-6 flex items-center gap-3 border-t border-brand-dark/5">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 h-12 rounded-xl bg-brand-dark text-white font-bold text-sm hover:bg-brand-primary hover:shadow-lg transition-all disabled:opacity-50 disabled:hover:scale-100 uppercase tracking-wider"
+            >
+              {loading ? "Saving..." : "Save Item"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setForm({
+                  name: "",
+                  description: "",
+                  image: null,
+                  rate: "",
+                  type: "veg",
+                  vegan: false,
+                  glutenFree: false,
+                  ingredients: [],
+                  category: "main_course",
+                  spiceLevel: 0,
+                });
+                setIngredientInput("");
+                setErrors({});
+                setServerError("");
+              }}
+              className="h-12 px-6 rounded-xl bg-brand-cream text-brand-dark/60 font-bold text-sm hover:bg-brand-dark/10 hover:text-brand-dark transition-colors"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+
+        {/* Preview */}
+        <div className="space-y-6">
+          <h2 className="text-xl font-bold text-brand-dark font-cutive px-2">
+            Live Preview
+          </h2>
+          <div className="bg-white rounded-3xl overflow-hidden shadow-2xl border border-brand-dark/5 sticky top-6">
+            {/* Image Area */}
+            <div className="relative h-64 bg-brand-cream/50 flex items-center justify-center overflow-hidden group">
+              {form.image ? (
+                <img
+                  src={URL.createObjectURL(form.image)}
+                  alt="Preview"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-3 text-brand-dark/20">
+                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-brand-dark/10 flex items-center justify-center">
+                    <Upload className="h-6 w-6" />
+                  </div>
+                  <span className="text-sm font-medium">Image Preview</span>
+                </div>
+              )}
+
+              {/* Overlay Gradient (Subtle) */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60" />
+
+              {/* Price Tag */}
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md shadow-lg px-4 py-2 rounded-full border border-brand-dark/5">
+                <span className="text-brand-dark font-bold font-cutive text-lg">
+                  {form.rate
+                    ? new Intl.NumberFormat("sv-SE", {
+                        style: "currency",
+                        currency: "SEK",
+                      }).format(Number(form.rate))
+                    : "0,00 kr"}
+                </span>
+              </div>
+
+              {/* Type Badge */}
+              <div className="absolute top-4 left-4">
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg backdrop-blur-md ${
+                    form.type === "veg"
+                      ? "bg-emerald-500 text-white"
+                      : "bg-rose-500 text-white"
+                  }`}
+                >
+                  {badge}
+                </span>
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="p-8">
+              <div className="flex justify-between items-start gap-4 mb-3">
+                <h3 className="text-2xl font-bold text-brand-dark font-cutive leading-tight">
+                  {form.name || "Item Name"}
+                </h3>
+              </div>
+
+              <p className="text-brand-dark/60 text-sm leading-relaxed mb-6 font-sans">
+                {form.description ||
+                  "Your delicious item description will appear here..."}
+              </p>
+
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-brand-cream border border-brand-dark/5 text-xs font-bold text-brand-dark/60 uppercase tracking-wide">
+                  {CATEGORIES.find((c) => c.value === form.category)?.label ||
+                    "Main Course"}
+                </span>
+
+                {form.spiceLevel > 0 && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-50 text-xs font-bold text-orange-600 border border-orange-100 uppercase tracking-wide">
+                    <Flame className="h-3 w-3 fill-orange-500" />
+                    {spiceText}
+                  </span>
+                )}
+
+                {form.vegan && (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 text-xs font-bold text-emerald-600 border border-emerald-100 uppercase tracking-wide">
+                    Vegan
+                  </span>
+                )}
+
+                {form.glutenFree && (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-xs font-bold text-blue-600 border border-blue-100 uppercase tracking-wide">
+                    Gluten-free
+                  </span>
+                )}
               </div>
 
               {/* Ingredients */}
-              <div className="mt-6">
-                <p className="text-xs font-medium mb-2" style={{ color: "#334155" }}>
+              <div>
+                <p className="text-[10px] font-bold text-brand-dark/30 uppercase tracking-[0.2em] mb-3">
                   Ingredients
                 </p>
                 {form.ingredients.length ? (
@@ -662,15 +749,16 @@ const FoodItem = () => {
                     {form.ingredients.map((ing) => (
                       <span
                         key={`preview-${ing}`}
-                        className="text-xs px-2 py-1 rounded-full"
-                        style={{ backgroundColor: "#f1f5f9", color: "#334155" }}
+                        className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-cream/50 border border-brand-dark/5 text-xs font-semibold text-brand-dark/70"
                       >
                         {ing}
                       </span>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm" style={{ color: "#64748b" }}>No ingredients added yet.</p>
+                  <p className="text-sm text-brand-dark/20 italic">
+                    No ingredients added yet.
+                  </p>
                 )}
               </div>
             </div>

@@ -1,12 +1,103 @@
 {
-  "brand": "TOM",
   "nav": {
     "home": "Home",
     "menu": "Menu",
-    "posts": "Posts",
-    "about": "About",
+    "gallery": "Gallery",
     "contact": "Contact",
-    "careers": "Careers"
+    "signin": "Sign In",
+    "signout": "Sign Out",
+    "back_to_admin": "Back to Admin"
   },
-  "cta": { "call": "Call to Order" }
+  "hero": {
+    "subtitle": "Authentic Indian Cuisine",
+    "title": "Taste of Madurai",
+    "description": "Experience the soulful flavors of South India, crafted with passion and traditional spices in the heart of Sweden.",
+    "cta_main": "View Full Menu",
+    "cta_secondary": "Book a Table",
+    "scroll": "Scroll to Explore"
+  },
+  "features": {
+    "authentic": {
+      "title": "Authentic Taste",
+      "desc": "Traditional recipes from Madurai"
+    },
+    "fresh": {
+      "title": "Fresh Ingredients",
+      "desc": "Farm-to-table quality spices"
+    },
+    "chefs": {
+      "title": "Master Chefs",
+      "desc": "Decades of culinary excellence"
+    }
+  },
+  "sections": {
+    "chefs_recommended": {
+      "badge": "Signature Picks",
+      "title": "Chef's Signatures",
+      "subtitle": "Our most beloved dishes, handpicked for an authentic Madurai experience",
+      "curated": "Curated Excellence",
+      "view_details": "View Details",
+      "view_full_menu": "View Full Menu"
+    },
+    "menu": {
+      "title": "Our Menu",
+      "subtitle": "Explore our wide range of authentic dishes",
+      "filter_all": "All",
+      "search_placeholder": "Search for dishes...",
+      "no_results": "No items found matching your search.",
+      "price": "Price"
+    },
+    "feedback": {
+      "trigger": "Feedback",
+      "title": "We value your thoughts",
+      "subtitle": "Help us improve Taste of Madurai. Share your experience with us!",
+      "rate_label": "Rate Experience",
+      "message_label": "Your Feedback",
+      "email_label": "Email",
+      "phone_label": "Phone",
+      "optional": "(optional)",
+      "send": "Send Feedback",
+      "sending": "Sending...",
+      "cancel": "Cancel",
+      "success_title": "Thank You!",
+      "success_msg": "We verify every message personally. Your feedback helps us grow.",
+      "close": "Close"
+    }
+  },
+  "footer": {
+    "brand_desc": "Bringing the authentic taste of Madurai to Sweden. Experience culinary excellence in every bite.",
+    "quick_links": "Quick Links",
+    "contact": "Contact Us",
+    "social": "Follow Us",
+    "rights": "All rights reserved."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "not_found": "Page Not Found",
+    "back_home": "Back to Home",
+    "open": "Open",
+    "closed": "Closed",
+    "sek": "SEK"
+  },
+  "content": {
+    "promise": {
+      "title": "Our Promise",
+      "items": [
+        "Authentic Madurai Recipes",
+        "Fresh, High-Quality Ingredients",
+        "No Artificial Colors or Preservatives",
+        "Prepared with Love & Tradition"
+      ],
+      "cta": {
+        "menu": "View Menu",
+        "contact": "Contact Us"
+      }
+    },
+    "founders": {
+      "title": "From Our Family to Yours",
+      "description": "Born from a longing for the authentic tastes of home, Taste of Madurai was founded to bring the vibrant culinary heritage of Tamil Nadu to Stockholm. Every dish we serve carries the legacy of our ancestors.",
+      "established": "Established 2024"
+    }
+  }
 }

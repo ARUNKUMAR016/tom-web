@@ -1,6 +1,10 @@
 // src/pages/AllItems.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { listFoodItems, deleteFoodItem, updateFoodItem } from "../../api/foodApi";
+import {
+  listFoodItems,
+  deleteFoodItem,
+  updateFoodItem,
+} from "../../api/foodApi";
 import { Link } from "react-router-dom";
 import {
   Pencil,
@@ -14,6 +18,7 @@ import {
   Flame,
 } from "lucide-react";
 import { toast } from "sonner";
+import { resolveImage } from "@/lib/imageUtils";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -26,13 +31,6 @@ const CATEGORY_OPTIONS = [
 ];
 
 const SPICE_LABELS = ["None", "Mild", "Medium", "Hot", "Very Hot", "Fire"];
-
-// Brand tokens (use inline to avoid Tailwind config changes)
-const brand = {
-  deep: "#253428",  // primary dark
-  sage: "#728175",  // accent
-  sand: "#CDBF9C",  // light
-};
 
 export default function AllItems() {
   const [items, setItems] = useState([]);
@@ -124,7 +122,7 @@ export default function AllItems() {
         _ingredientInput: "",
         // Image fields:
         imageFile: null,
-        imagePreview: it.imageUrl ? `${API_BASE}${it.imageUrl}` : null,
+        imagePreview: resolveImage(it.imageUrl) || null,
         hasNewImage: false,
       },
     }));
@@ -245,44 +243,27 @@ export default function AllItems() {
   };
 
   return (
-    <div
-      className="min-h-[calc(100vh-4rem)]"
-      style={{
-        ["--brand-deep"]: brand.deep,
-        ["--brand-sage"]: brand.sage,
-        ["--brand-sand"]: brand.sand,
-      }}
-    >
-      {/* Page Header (replaces NavHeader) */}
-      <header
-        className="flex items-center justify-between gap-4 px-5 py-4 border-b"
-        style={{ backgroundColor: "var(--brand-sand)", borderColor: "#e6dec7" }}
-      >
+    <div className="min-h-[calc(100vh-4rem)] pb-20">
+      {/* Page Header */}
+      <header className="flex items-center justify-between gap-4 py-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg"
-               style={{ backgroundColor: "#ffffffa8", border: "1px solid #e6dec7" }}>
-            <Search className="h-4 w-4" style={{ color: "var(--brand-deep)" }} />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neon-gold/10 text-neon-gold border border-neon-gold/20 shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+            <Search className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold" style={{ color: "var(--brand-deep)" }}>
+            <h1 className="text-2xl font-bold text-white font-cutive">
               All Food Items
             </h1>
-            <p className="text-xs" style={{ color: "rgba(37,52,40,0.7)" }}>
+            <p className="text-sm text-white/40">
               Manage every dish — edit, filter, and remove.
             </p>
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <Link
             to="/admin/home"
-            className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition"
-            style={{
-              backgroundColor: "rgba(255,255,255,0.6)",
-              border: "1px solid #e6dec7",
-              color: "var(--brand-deep)",
-            }}
-            title="Back to Admin Home"
+            className="hidden sm:inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/5"
           >
             <ArrowLeft className="h-4 w-4" />
             Home
@@ -290,13 +271,7 @@ export default function AllItems() {
 
           <Link
             to="/admin/items/new"
-            className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition"
-            style={{
-              backgroundColor: "var(--brand-deep)",
-              color: "#fff",
-              border: "1px solid rgba(0,0,0,0.05)",
-            }}
-            title="Add New Item"
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all bg-neon-gold text-black hover:bg-neon-gold/90 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)]"
           >
             <PlusCircle className="h-4 w-4" />
             Add New
@@ -304,39 +279,23 @@ export default function AllItems() {
         </div>
       </header>
 
-      <div
-        className="px-5 py-6"
-        style={{ background: "linear-gradient(180deg, #f7f3e6 0%, #efe8d4 100%)" }}
-      >
-        {/* Controls */}
-        <div
-          className="mb-6 flex flex-wrap items-center gap-3 rounded-xl p-2 shadow-sm"
-          style={{ backgroundColor: "#fff", border: "1px solid var(--brand-sand)" }}
-        >
-          {/* Search */}
-          <div className="relative flex-1 min-w-[220px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
-                    style={{ color: "#94a3b8" }} />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search by name, ingredient, description…"
-              className="w-full rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none"
-              style={{
-                backgroundColor: "#F8FAFC",
-                border: "1px solid #e2e8f0",
-                color: "#0f172a",
-                boxShadow: "inset 0 0 0 0 transparent",
-              }}
-              onFocus={(e) => (e.currentTarget.style.boxShadow = "0 0 0 2px rgba(114,129,117,0.25)")}
-              onBlur={(e) => (e.currentTarget.style.boxShadow = "inset 0 0 0 0 transparent")}
-            />
-          </div>
+      {/* Controls */}
+      <div className="mb-8 flex flex-wrap items-center gap-4 p-4 rounded-2xl bg-admin-card backdrop-blur-md border border-admin-border">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[240px]">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search by name, ingredient, description…"
+            className="w-full rounded-xl pl-11 pr-4 py-3 text-sm bg-black/40 border border-admin-border text-white placeholder-white/20 focus:outline-none focus:border-neon-gold/50 focus:ring-1 focus:ring-neon-gold/50 transition-all"
+          />
+        </div>
 
-          {/* Type */}
+        {/* Filters */}
+        <div className="flex flex-wrap gap-3">
           <select
-            className="w-[160px] rounded-lg px-3 py-2 text-sm focus:outline-none"
-            style={{ backgroundColor: "#F8FAFC", border: "1px solid #e2e8f0", color: "#0f172a" }}
+            className="rounded-xl px-4 py-3 text-sm bg-black/40 border border-admin-border text-white/80 focus:outline-none focus:border-neon-gold/50 cursor-pointer hover:bg-black/60 transition-colors"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
           >
@@ -345,10 +304,8 @@ export default function AllItems() {
             <option value="nonveg">Non-veg</option>
           </select>
 
-          {/* Category */}
           <select
-            className="w-[190px] rounded-lg px-3 py-2 text-sm focus:outline-none"
-            style={{ backgroundColor: "#F8FAFC", border: "1px solid #e2e8f0", color: "#0f172a" }}
+            className="rounded-xl px-4 py-3 text-sm bg-black/40 border border-admin-border text-white/80 focus:outline-none focus:border-neon-gold/50 cursor-pointer hover:bg-black/60 transition-colors"
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
           >
@@ -358,215 +315,197 @@ export default function AllItems() {
               </option>
             ))}
           </select>
+        </div>
 
-          {/* Vegan */}
-          <label className="inline-flex items-center gap-2 text-sm px-2 py-1" style={{ color: "#334155" }}>
+        {/* Toggles */}
+        <div className="flex items-center gap-4 px-2">
+          <label className="inline-flex items-center gap-2 text-sm text-white/80 cursor-pointer group">
+            <div
+              className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                filterVegan
+                  ? "bg-neon-green border-neon-green"
+                  : "border-white/20 group-hover:border-white/40"
+              }`}
+            >
+              {filterVegan && <div className="w-2 h-2 bg-black rounded-sm" />}
+            </div>
             <input
               type="checkbox"
               checked={filterVegan}
               onChange={(e) => setFilterVegan(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300"
+              className="hidden"
             />
             Vegan
           </label>
 
-          {/* Gluten-free */}
-          <label className="inline-flex items-center gap-2 text-sm px-2 py-1" style={{ color: "#334155" }}>
+          <label className="inline-flex items-center gap-2 text-sm text-white/80 cursor-pointer group">
+            <div
+              className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                filterGluten
+                  ? "bg-neon-blue border-neon-blue"
+                  : "border-white/20 group-hover:border-white/40"
+              }`}
+            >
+              {filterGluten && <div className="w-2 h-2 bg-black rounded-sm" />}
+            </div>
             <input
               type="checkbox"
               checked={filterGluten}
               onChange={(e) => setFilterGluten(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300"
+              className="hidden"
             />
             Gluten-free
           </label>
         </div>
+      </div>
 
-        {error && (
-          <div
-            className="mb-4 rounded-xl px-3 py-2 text-sm"
-            style={{ border: "1px solid #fecaca", backgroundColor: "#fef2f2", color: "#b91c1c" }}
-          >
-            {error}
-          </div>
-        )}
+      {error && (
+        <div className="mb-6 rounded-xl px-4 py-3 text-sm bg-red-500/10 border border-red-500/20 text-red-400 flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+          {error}
+        </div>
+      )}
 
-        {/* Loading skeletons */}
-        {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
+      {/* Grid */}
+      {loading ? (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded-3xl p-4 bg-admin-card border border-admin-border animate-pulse"
+            >
+              <div className="h-48 w-full rounded-2xl bg-white/5 mb-4" />
+              <div className="h-6 w-2/3 bg-white/5 rounded mb-2" />
+              <div className="h-4 w-full bg-white/5 rounded mb-2" />
+              <div className="h-4 w-1/2 bg-white/5 rounded" />
+            </div>
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <EmptyState query={q} />
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((it) => {
+            const id = String(it.id || it._id);
+            const categoryLabel =
+              CATEGORY_OPTIONS.find((c) => c.value === it.category)?.label ||
+              undefined;
+            const spiceText =
+              typeof it.spiceLevel === "number"
+                ? SPICE_LABELS[it.spiceLevel] || `${it.spiceLevel}`
+                : null;
+
+            return (
               <div
-                key={i}
-                className="rounded-2xl p-4 shadow-sm animate-pulse"
-                style={{ backgroundColor: "#fff", border: "1px solid var(--brand-sand)" }}
+                key={id}
+                className="group relative overflow-hidden rounded-3xl bg-admin-card backdrop-blur-md border border-admin-border transition-all duration-300 hover:-translate-y-1 hover:border-neon-gold/30 hover:shadow-[0_0_30px_rgba(0,0,0,0.3)]"
               >
-                <div className="h-40 w-full rounded-lg bg-slate-200 mb-3" />
-                <div className="h-5 w-2/3 bg-slate-200 rounded mb-2" />
-                <div className="h-4 w-full bg-slate-200 rounded mb-1" />
-                <div className="h-4 w-5/6 bg-slate-200 rounded" />
-              </div>
-            ))}
-          </div>
-        ) : filtered.length === 0 ? (
-          <EmptyState query={q} />
-        ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((it) => {
-              const id = String(it.id || it._id);
-              const categoryLabel =
-                CATEGORY_OPTIONS.find((c) => c.value === it.category)?.label ||
-                undefined;
-              const spiceText =
-                typeof it.spiceLevel === "number"
-                  ? SPICE_LABELS[it.spiceLevel] || `${it.spiceLevel}`
-                  : null;
-
-              return (
-                <div
-                  key={id}
-                  className="group relative overflow-hidden rounded-2xl shadow-sm transition hover:shadow-md"
-                  style={{ backgroundColor: "#fff", border: "1px solid var(--brand-sand)" }}
-                >
-                  {/* Image */}
-                  <div className="relative">
-                    {it.imageUrl ? (
-                      <img
-                        src={`${API_BASE}${it.imageUrl}`}
-                        alt={it.name}
-                        className="h-44 w-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                          const fallback = e.currentTarget.nextSibling;
-                          if (fallback) fallback.style.display = "flex";
-                        }}
-                      />
-                    ) : null}
-                    {/* Fallback */}
-                    <div
-                      className={`${it.imageUrl ? "hidden" : "flex"} h-44 w-full items-center justify-center`}
-                      style={{ backgroundColor: "#f1f5f9" }}
-                    >
-                      <ImageOff className="h-6 w-6" style={{ color: "#94a3b8" }} />
-                    </div>
-
-                    {/* Price chip */}
-                    <div
-                      className="absolute right-3 top-3 rounded-full px-3 py-1 text-sm font-semibold shadow-sm backdrop-blur"
-                      style={{
-                        backgroundColor: "rgba(255,255,255,0.9)",
-                        color: "var(--brand-deep)",
-                        border: "1px solid var(--brand-sand)",
+                {/* Image */}
+                <div className="relative h-52 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
+                  {it.imageUrl ? (
+                    <img
+                      src={resolveImage(it.imageUrl)}
+                      alt={it.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        const fallback = e.currentTarget.nextSibling;
+                        if (fallback) fallback.style.display = "flex";
                       }}
-                    >
-                      {new Intl.NumberFormat("sv-SE", {
-                        style: "currency",
-                        currency: "SEK",
-                      }).format(it.rate)}
-                    </div>
+                    />
+                  ) : null}
+                  {/* Fallback */}
+                  <div
+                    className={`${
+                      it.imageUrl ? "hidden" : "flex"
+                    } h-full w-full items-center justify-center bg-white/5`}
+                  >
+                    <ImageOff className="h-8 w-8 text-white/20" />
                   </div>
 
-                  {/* Body */}
-                  <div className="p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <h2 className="text-lg font-semibold leading-tight" style={{ color: "#0f172a" }}>
-                        {it.name}
-                      </h2>
+                  {/* Price chip */}
+                  <div className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-neon-gold font-bold text-sm shadow-lg">
+                    {new Intl.NumberFormat("sv-SE", {
+                      style: "currency",
+                      currency: "SEK",
+                    }).format(it.rate)}
+                  </div>
 
-                      {/* Actions */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => startEdit(it)}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border bg-white hover:bg-slate-50"
-                          style={{ borderColor: "#e2e8f0", color: "#334155" }}
-                          title="Edit"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => askDelete(it)}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border bg-rose-50 hover:bg-rose-100"
-                          style={{ borderColor: "#fecdd3", color: "#be123c" }}
-                          title="Delete"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <p className="mt-1 text-sm" style={{ color: "#475569" }}>
-                      {it.description}
-                    </p>
-
-                    <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-                      <span
-                        className="inline-flex items-center rounded-full px-2 py-0.5"
-                        style={{
-                          backgroundColor: it.type === "veg" ? "#dcfce7" : "#fee2e2",
-                          color: it.type === "veg" ? "#15803d" : "#b91c1c",
-                        }}
-                      >
-                        {it.type}
-                      </span>
-
-                      {categoryLabel && (
-                        <span
-                          className="inline-flex items-center rounded-full px-2 py-0.5"
-                          style={{ backgroundColor: "#fff7ed", color: "#b45309", border: "1px dashed #fde68a" }}
-                        >
-                          {categoryLabel}
-                        </span>
-                      )}
-
-                      {typeof it.spiceLevel === "number" && (
-                        <span
-                          className="inline-flex items-center gap-1 rounded-full px-2 py-0.5"
-                          style={{ backgroundColor: "#fff7ed", color: "#9a3412" }}
-                        >
-                          <Flame className="h-3 w-3" />
-                          {spiceText}
-                        </span>
-                      )}
-
-                      {it.vegan && (
-                        <span className="inline-flex items-center rounded-full px-2 py-0.5"
-                              style={{ backgroundColor: "#d1fae5", color: "#065f46" }}>
-                          Vegan
-                        </span>
-                      )}
-                      {it.glutenFree && (
-                        <span className="inline-flex items-center rounded-full px-2 py-0.5"
-                              style={{ backgroundColor: "#e0e7ff", color: "#4338ca" }}>
-                          GF
-                        </span>
-                      )}
-                    </div>
-
-                    {!!it.ingredients?.length && (
-                      <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-xs"
-                          style={{ color: "#475569" }}>
-                        {it.ingredients.map((g, i) => (
-                          <li key={i} className="truncate">• {g}</li>
-                        ))}
-                      </ul>
-                    )}
-
-                    <div className="mt-4 flex items-center">
-                      <Link
-                        to={`/items/${id}`}
-                        className="ml-auto text-sm hover:underline"
-                        style={{ color: "var(--brand-sage)" }}
-                        title="View details"
-                      >
-                        View
-                      </Link>
-                    </div>
+                  {/* Type Badge */}
+                  <div className="absolute top-4 left-4 z-20">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                        it.type === "veg"
+                          ? "bg-neon-green/10 text-neon-green border-neon-green/20"
+                          : "bg-red-500/10 text-red-400 border-red-500/20"
+                      }`}
+                    >
+                      {it.type}
+                    </span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+
+                {/* Body */}
+                <div className="p-6 relative z-20">
+                  <div className="flex items-start justify-between gap-4 mb-3">
+                    <h2 className="text-xl font-bold text-white leading-tight font-cutive group-hover:text-neon-gold transition-colors">
+                      {it.name}
+                    </h2>
+                  </div>
+
+                  <p className="text-sm text-white/60 line-clamp-2 mb-4 h-10">
+                    {it.description}
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-2 mb-6">
+                    {categoryLabel && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-md bg-white/5 border border-white/10 text-xs text-white/60">
+                        {categoryLabel}
+                      </span>
+                    )}
+
+                    {typeof it.spiceLevel === "number" && it.spiceLevel > 0 && (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-orange-500/10 border border-orange-500/20 text-xs text-orange-400">
+                        <Flame className="h-3 w-3" />
+                        {spiceText}
+                      </span>
+                    )}
+
+                    {it.vegan && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-md bg-neon-green/5 border border-neon-green/10 text-xs text-neon-green/80">
+                        Vegan
+                      </span>
+                    )}
+                    {it.glutenFree && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-md bg-neon-blue/5 border border-neon-blue/10 text-xs text-neon-blue/80">
+                        GF
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 pt-4 border-t border-white/5">
+                    <button
+                      onClick={() => startEdit(it)}
+                      className="flex-1 h-10 flex items-center justify-center gap-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 hover:text-white text-sm font-medium transition-colors"
+                    >
+                      <Pencil className="h-4 w-4" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => askDelete(it)}
+                      className="h-10 w-10 flex items-center justify-center rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Edit Dialog */}
       {editId && (
@@ -618,28 +557,21 @@ export default function AllItems() {
 /* ───────────────────────── Empty State ───────────────────────── */
 function EmptyState({ query }) {
   return (
-    <div
-      className="rounded-2xl border border-dashed p-10 text-center"
-      style={{ borderColor: "var(--brand-sand)", backgroundColor: "#faf6ea" }}
-    >
-      <div
-        className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full shadow-sm"
-        style={{ backgroundColor: "#fff", border: "1px solid var(--brand-sand)" }}
-      >
-        <Search className="h-5 w-5" style={{ color: "#ea580c" }} />
+    <div className="rounded-3xl border border-dashed border-white/10 p-12 text-center bg-white/5">
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5 border border-white/10 shadow-inner">
+        <Search className="h-8 w-8 text-white/20" />
       </div>
-      <h3 className="text-base font-semibold" style={{ color: "#1f2937" }}>
+      <h3 className="text-lg font-bold text-white font-cutive">
         {query ? "No matching items" : "No items yet"}
       </h3>
-      <p className="mt-1 text-sm" style={{ color: "#475569" }}>
+      <p className="mt-2 text-sm text-white/40 max-w-xs mx-auto">
         {query
           ? "Try a different keyword or clear the filters."
           : "Add your first dish to get started."}
       </p>
       <Link
-        to="/fooditems"
-        className="mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium hover:opacity-95"
-        style={{ backgroundColor: "var(--brand-deep)", color: "#fff" }}
+        to="/admin/items/new"
+        className="mt-6 inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold bg-neon-gold text-black hover:bg-neon-gold/90 transition-all shadow-[0_0_20px_rgba(255,215,0,0.2)]"
       >
         <PlusCircle className="h-4 w-4" />
         Add New
@@ -669,7 +601,9 @@ function EditDialog({
   }, [onClose]);
 
   useEffect(() => {
-    const el = dialogRef.current?.querySelector("input, textarea, button, select");
+    const el = dialogRef.current?.querySelector(
+      "input, textarea, button, select"
+    );
     el?.focus();
   }, []);
 
@@ -681,35 +615,36 @@ function EditDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
       role="dialog"
       aria-modal="true"
       onMouseDown={onBackdrop}
     >
       <div
         ref={dialogRef}
-        className="w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5"
+        className="w-full max-w-2xl overflow-hidden rounded-3xl bg-[#1a1c20] border border-white/10 shadow-2xl ring-1 ring-white/5"
         onMouseDown={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: "#e5e7eb" }}>
-          <h3 className="text-base font-semibold" style={{ color: "var(--brand-deep)" }}>Edit Item</h3>
+        <div className="flex items-center justify-between border-b border-white/5 px-6 py-4 bg-white/5">
+          <h3 className="text-lg font-bold text-white font-cutive">
+            Edit Item
+          </h3>
           <button
             onClick={onClose}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-slate-100"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
             title="Close"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="max-h-[70vh] overflow-y-auto px-4 py-4">
-          {/* Image */}
-          <Labeled label="Image">
-            <div className="mt-2 flex items-start gap-4">
-              <div className="w-32 h-32 rounded-lg overflow-hidden flex items-center justify-center"
-                   style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0" }}>
+        <div className="max-h-[70vh] overflow-y-auto px-6 py-6 custom-scrollbar">
+          <div className="grid gap-6">
+            {/* Image */}
+            <div className="flex items-start gap-6">
+              <div className="w-32 h-32 rounded-2xl overflow-hidden flex items-center justify-center bg-black/40 border border-white/10 relative group">
                 {state.imagePreview ? (
                   <img
                     src={state.imagePreview}
@@ -717,14 +652,17 @@ function EditDialog({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-xs" style={{ color: "#94a3b8" }}>No image</span>
+                  <span className="text-xs text-white/20">No image</span>
                 )}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Pencil className="h-6 w-6 text-white" />
+                </div>
               </div>
               <div className="flex-1">
-                <label
-                  className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm cursor-pointer transition"
-                  style={{ backgroundColor: "#fff", border: "1px solid var(--brand-sand)" }}
-                >
+                <label className="block text-sm font-medium text-white/80 mb-2">
+                  Item Image
+                </label>
+                <label className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm cursor-pointer transition-all bg-white/5 border border-white/10 hover:bg-white/10 text-white">
                   <input
                     type="file"
                     accept="image/*"
@@ -738,220 +676,280 @@ function EditDialog({
                       onPickImage(file);
                     }}
                   />
-                  Change image
+                  <PlusCircle className="h-4 w-4" />
+                  Change Image
                 </label>
 
                 {state.hasNewImage && (
-                  <p className="mt-2 text-xs" style={{ color: "#b45309" }}>
-                    A new image will be uploaded when you click <b>Save</b>.
+                  <p className="mt-3 text-xs text-neon-gold">
+                    * New image selected. Save to apply.
                   </p>
                 )}
               </div>
             </div>
-          </Labeled>
 
-          {/* Name */}
-          <Labeled label="Name" className="mt-4">
-            <input
-              className="mt-1 w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
-              style={{ border: "1px solid var(--brand-sand)" }}
-              value={state.name}
-              onChange={(e) =>
-                onChange((s) => ({
-                  ...s,
-                  [id]: { ...s[id], name: e.target.value },
-                }))
-              }
-            />
-          </Labeled>
+            <div className="grid sm:grid-cols-2 gap-6">
+              {/* Name */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-white/60 uppercase tracking-wider">
+                  Name
+                </label>
+                <input
+                  className="w-full rounded-xl px-4 py-3 text-sm bg-black/40 border border-white/10 text-white focus:outline-none focus:border-neon-gold/50 focus:ring-1 focus:ring-neon-gold/50 transition-all"
+                  value={state.name}
+                  onChange={(e) =>
+                    onChange((s) => ({
+                      ...s,
+                      [id]: { ...s[id], name: e.target.value },
+                    }))
+                  }
+                />
+              </div>
 
-          {/* Rate */}
-          <Labeled label="Rate" className="mt-3">
-            <input
-              type="number"
-              className="mt-1 w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
-              style={{ border: "1px solid var(--brand-sand)" }}
-              value={state.rate}
-              onChange={(e) =>
-                onChange((s) => ({
-                  ...s,
-                  [id]: { ...s[id], rate: e.target.value },
-                }))
-              }
-            />
-          </Labeled>
-
-          {/* Type */}
-          <Labeled label="Type" className="mt-3">
-            <div className="mt-1 flex gap-4">
-              <Radio
-                name={`type-${id}`}
-                checked={state.type === "veg"}
-                onChange={() =>
-                  onChange((s) => ({ ...s, [id]: { ...s[id], type: "veg" } }))
-                }
-                label="Veg"
-              />
-              <Radio
-                name={`type-${id}`}
-                checked={state.type === "nonveg"}
-                onChange={() =>
-                  onChange((s) => ({
-                    ...s,
-                    [id]: { ...s[id], type: "nonveg" },
-                  }))
-                }
-                label="Non-veg"
-              />
-            </div>
-          </Labeled>
-
-          {/* Category */}
-          <Labeled label="Category" className="mt-3">
-            <select
-              className="mt-1 w-full rounded-lg bg-white px-3 py-2 text-sm focus:outline-none"
-              style={{ border: "1px solid var(--brand-sand)" }}
-              value={state.category}
-              onChange={(e) =>
-                onChange((s) => ({
-                  ...s,
-                  [id]: { ...s[id], category: e.target.value },
-                }))
-              }
-            >
-              {CATEGORY_OPTIONS.filter((c) => c.value !== "all").map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
-          </Labeled>
-
-          {/* Vegan & Gluten Free */}
-          <div className="mt-3 flex flex-wrap items-center gap-6">
-            <Checkbox
-              checked={!!state.vegan}
-              onChange={(e) =>
-                onChange((s) => ({
-                  ...s,
-                  [id]: { ...s[id], vegan: e.target.checked },
-                }))
-              }
-              label="Vegan"
-            />
-            <Checkbox
-              checked={!!state.glutenFree}
-              onChange={(e) =>
-                onChange((s) => ({
-                  ...s,
-                  [id]: { ...s[id], glutenFree: e.target.checked },
-                }))
-              }
-              label="Gluten-free"
-            />
-          </div>
-
-          {/* Spice Level */}
-          <Labeled label="Spice Level" className="mt-3">
-            <input
-              type="range"
-              min="0"
-              max="5"
-              step="1"
-              value={Number(state.spiceLevel ?? 0)}
-              onChange={(e) =>
-                onChange((s) => ({
-                  ...s,
-                  [id]: { ...s[id], spiceLevel: Number(e.target.value) },
-                }))
-              }
-              className="w-full"
-            />
-            <div className="mt-1 text-xs" style={{ color: "#475569" }}>
-              {SPICE_LABELS[state.spiceLevel] ?? "None"}
-            </div>
-          </Labeled>
-
-          {/* Ingredients */}
-          <Labeled label="Ingredients" className="mt-3">
-            <div className="mt-2 flex flex-wrap gap-2">
-              {(state.ingredients || []).map((g, idx) => (
-                <span
-                  key={idx}
-                  className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs"
-                  style={{ backgroundColor: "#fff7ed", border: "1px solid var(--brand-sand)", color: "#334155" }}
-                >
-                  {g}
-                  <button
-                    type="button"
-                    className="rounded-full px-1 leading-none"
-                    style={{ border: "1px solid #fcd34d" }}
-                    onClick={() => onRemoveIngredient(idx)}
-                    title="Remove"
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
+              {/* Rate */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-white/60 uppercase tracking-wider">
+                  Rate (SEK)
+                </label>
+                <input
+                  type="number"
+                  className="w-full rounded-xl px-4 py-3 text-sm bg-black/40 border border-white/10 text-white focus:outline-none focus:border-neon-gold/50 focus:ring-1 focus:ring-neon-gold/50 transition-all"
+                  value={state.rate}
+                  onChange={(e) =>
+                    onChange((s) => ({
+                      ...s,
+                      [id]: { ...s[id], rate: e.target.value },
+                    }))
+                  }
+                />
+              </div>
             </div>
 
-            <div className="mt-2 flex gap-2">
-              <input
-                className="flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none"
-                style={{ border: "1px solid var(--brand-sand)" }}
-                placeholder="Type an ingredient and press Enter"
-                value={state._ingredientInput || ""}
+            {/* Description */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-white/60 uppercase tracking-wider">
+                Description
+              </label>
+              <textarea
+                rows={3}
+                className="w-full rounded-xl px-4 py-3 text-sm bg-black/40 border border-white/10 text-white focus:outline-none focus:border-neon-gold/50 focus:ring-1 focus:ring-neon-gold/50 transition-all resize-none"
+                value={state.description}
                 onChange={(e) =>
                   onChange((s) => ({
                     ...s,
-                    [id]: { ...s[id], _ingredientInput: e.target.value },
+                    [id]: { ...s[id], description: e.target.value },
                   }))
                 }
-                onKeyDown={(e) => onIngredientKeyDown(e, id)}
               />
-              <button
-                type="button"
-                onClick={() => onAddIngredient(id)}
-                className="rounded-lg px-3 py-2 text-sm transition"
-                style={{ backgroundColor: "#fff", border: "1px solid var(--brand-sand)" }}
-              >
-                Add
-              </button>
             </div>
-          </Labeled>
 
-          {/* Description */}
-          <Labeled label="Description" className="mt-3">
-            <textarea
-              rows={3}
-              className="mt-1 w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
-              style={{ border: "1px solid var(--brand-sand)" }}
-              value={state.description}
-              onChange={(e) =>
-                onChange((s) => ({
-                  ...s,
-                  [id]: { ...s[id], description: e.target.value },
-                }))
-              }
-            />
-          </Labeled>
+            {/* Type & Category */}
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-white/60 uppercase tracking-wider">
+                  Type
+                </label>
+                <div className="flex gap-4 p-1">
+                  <label className="inline-flex items-center gap-2 cursor-pointer">
+                    <div
+                      className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                        state.type === "veg"
+                          ? "border-neon-green"
+                          : "border-white/20"
+                      }`}
+                    >
+                      {state.type === "veg" && (
+                        <div className="w-2 h-2 rounded-full bg-neon-green" />
+                      )}
+                    </div>
+                    <input
+                      type="radio"
+                      name={`type-${id}`}
+                      className="hidden"
+                      checked={state.type === "veg"}
+                      onChange={() =>
+                        onChange((s) => ({
+                          ...s,
+                          [id]: { ...s[id], type: "veg" },
+                        }))
+                      }
+                    />
+                    <span className="text-sm text-white">Veg</span>
+                  </label>
+                  <label className="inline-flex items-center gap-2 cursor-pointer">
+                    <div
+                      className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                        state.type === "nonveg"
+                          ? "border-red-500"
+                          : "border-white/20"
+                      }`}
+                    >
+                      {state.type === "nonveg" && (
+                        <div className="w-2 h-2 rounded-full bg-red-500" />
+                      )}
+                    </div>
+                    <input
+                      type="radio"
+                      name={`type-${id}`}
+                      className="hidden"
+                      checked={state.type === "nonveg"}
+                      onChange={() =>
+                        onChange((s) => ({
+                          ...s,
+                          [id]: { ...s[id], type: "nonveg" },
+                        }))
+                      }
+                    />
+                    <span className="text-sm text-white">Non-veg</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-white/60 uppercase tracking-wider">
+                  Category
+                </label>
+                <select
+                  className="w-full rounded-xl px-4 py-3 text-sm bg-black/40 border border-white/10 text-white focus:outline-none focus:border-neon-gold/50 focus:ring-1 focus:ring-neon-gold/50 transition-all"
+                  value={state.category}
+                  onChange={(e) =>
+                    onChange((s) => ({
+                      ...s,
+                      [id]: { ...s[id], category: e.target.value },
+                    }))
+                  }
+                >
+                  {CATEGORY_OPTIONS.map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Toggles */}
+            <div className="flex gap-6">
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <div
+                  className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                    state.vegan
+                      ? "bg-neon-green border-neon-green"
+                      : "border-white/20 bg-black/40"
+                  }`}
+                >
+                  {state.vegan && (
+                    <div className="w-2.5 h-2.5 bg-black rounded-sm" />
+                  )}
+                </div>
+                <input
+                  type="checkbox"
+                  className="hidden"
+                  checked={state.vegan}
+                  onChange={(e) =>
+                    onChange((s) => ({
+                      ...s,
+                      [id]: { ...s[id], vegan: e.target.checked },
+                    }))
+                  }
+                  disabled={state.type === "nonveg"}
+                />
+                <span
+                  className={`text-sm ${
+                    state.type === "nonveg" ? "text-white/20" : "text-white"
+                  }`}
+                >
+                  Vegan
+                </span>
+              </label>
+
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <div
+                  className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                    state.glutenFree
+                      ? "bg-neon-blue border-neon-blue"
+                      : "border-white/20 bg-black/40"
+                  }`}
+                >
+                  {state.glutenFree && (
+                    <div className="w-2.5 h-2.5 bg-black rounded-sm" />
+                  )}
+                </div>
+                <input
+                  type="checkbox"
+                  className="hidden"
+                  checked={state.glutenFree}
+                  onChange={(e) =>
+                    onChange((s) => ({
+                      ...s,
+                      [id]: { ...s[id], glutenFree: e.target.checked },
+                    }))
+                  }
+                />
+                <span className="text-sm text-white">Gluten-free</span>
+              </label>
+            </div>
+
+            {/* Ingredients */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-white/60 uppercase tracking-wider">
+                Ingredients
+              </label>
+              <div className="flex gap-2">
+                <input
+                  className="flex-1 rounded-xl px-4 py-3 text-sm bg-black/40 border border-white/10 text-white focus:outline-none focus:border-neon-gold/50 focus:ring-1 focus:ring-neon-gold/50 transition-all"
+                  placeholder="Add ingredient..."
+                  value={state._ingredientInput || ""}
+                  onChange={(e) =>
+                    onChange((s) => ({
+                      ...s,
+                      [id]: { ...s[id], _ingredientInput: e.target.value },
+                    }))
+                  }
+                  onKeyDown={onIngredientKeyDown}
+                />
+                <button
+                  type="button"
+                  onClick={onAddIngredient}
+                  className="px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
+                >
+                  Add
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {(state.ingredients || []).map((ing, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs bg-white/5 border border-white/10 text-white/80"
+                  >
+                    {ing}
+                    <button
+                      type="button"
+                      onClick={() => onRemoveIngredient(idx)}
+                      className="hover:text-red-400 ml-1"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 border-t px-4 py-3" style={{ borderColor: "#e5e7eb" }}>
+        <div className="flex items-center justify-end gap-3 border-t border-white/5 px-6 py-4 bg-white/5">
           <button
             onClick={onClose}
-            className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm transition"
-            style={{ backgroundColor: "#fff", border: "1px solid #e2e8f0", color: "#334155" }}
+            className="rounded-xl px-5 py-2.5 text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onSave}
-            className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition"
-            style={{ backgroundColor: "var(--brand-deep)", color: "#fff" }}
+            className="rounded-xl px-6 py-2.5 text-sm font-bold bg-neon-gold text-black hover:bg-neon-gold/90 shadow-lg shadow-neon-gold/10 transition-all"
           >
-            <Save className="h-4 w-4" /> Save
+            Save Changes
           </button>
         </div>
       </div>
@@ -975,46 +973,46 @@ function DeleteDialog({ name, loading, onCancel, onConfirm }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
       role="dialog"
       aria-modal="true"
       onMouseDown={onBackdrop}
     >
       <div
         ref={boxRef}
-        className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5"
+        className="w-full max-w-md overflow-hidden rounded-3xl bg-[#1a1c20] border border-white/10 shadow-2xl ring-1 ring-white/5"
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: "#e5e7eb" }}>
-          <h3 className="text-base font-semibold" style={{ color: "#be123c" }}>Delete item</h3>
+        <div className="flex items-center justify-between border-b border-white/5 px-6 py-4 bg-white/5">
+          <h3 className="text-lg font-bold text-red-400 font-cutive">
+            Delete Item
+          </h3>
           <button
             onClick={onCancel}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-slate-100"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
             title="Close"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="px-4 py-4 text-sm" style={{ color: "#334155" }}>
+        <div className="px-6 py-6 text-sm text-white/80">
           Are you sure you want to delete{" "}
-          <span className="font-semibold" style={{ color: "#111827" }}>{name}</span>? This action cannot be
-          undone.
+          <span className="font-bold text-white">{name}</span>? This action
+          cannot be undone.
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t px-4 py-3" style={{ borderColor: "#e5e7eb" }}>
+        <div className="flex items-center justify-end gap-3 border-t border-white/5 px-6 py-4 bg-white/5">
           <button
             onClick={onCancel}
-            className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm transition"
-            style={{ backgroundColor: "#fff", border: "1px solid #e2e8f0", color: "#334155" }}
+            className="rounded-xl px-5 py-2.5 text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-colors"
             disabled={loading}
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition disabled:opacity-60"
-            style={{ backgroundColor: "#e11d48", color: "#fff" }}
+            className="inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all disabled:opacity-50"
             disabled={loading}
           >
             {loading ? (
@@ -1028,31 +1026,5 @@ function DeleteDialog({ name, loading, onCancel, onConfirm }) {
         </div>
       </div>
     </div>
-  );
-}
-
-/* ───────────────────────── Small UI helpers ───────────────────────── */
-function Labeled({ label, className = "", children }) {
-  return (
-    <div className={className}>
-      <label className="text-xs" style={{ color: "#64748b" }}>{label}</label>
-      {children}
-    </div>
-  );
-}
-function Radio({ label, ...props }) {
-  return (
-    <label className="inline-flex items-center gap-2 text-sm" style={{ color: "#334155" }}>
-      <input type="radio" {...props} />
-      {label}
-    </label>
-  );
-}
-function Checkbox({ label, ...props }) {
-  return (
-    <label className="inline-flex items-center gap-2 text-sm" style={{ color: "#334155" }}>
-      <input type="checkbox" {...props} />
-      {label}
-    </label>
   );
 }

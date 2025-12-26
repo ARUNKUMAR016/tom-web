@@ -1,12 +1,103 @@
 {
-  "brand": "TOM",
   "nav": {
     "home": "Hem",
     "menu": "Meny",
-    "posts": "Inlägg",
-    "about": "Om oss",
+    "gallery": "Galleri",
     "contact": "Kontakt",
-    "careers": "Karriär"
+    "signin": "Logga in",
+    "signout": "Logga ut",
+    "back_to_admin": "Till Admin"
   },
-  "cta": { "call": "Ring för att beställa" }
+  "hero": {
+    "subtitle": "Autentisk Indisk Mat",
+    "title": "Taste of Madurai",
+    "description": "Upplev själsfulla smaker från södra Indien, lagade med passion och traditionella kryddor i hjärtat av Sverige.",
+    "cta_main": "Visa Meny",
+    "cta_secondary": "Boka Bord",
+    "scroll": "Scrolla för mer"
+  },
+  "features": {
+    "authentic": {
+      "title": "Äkta Smak",
+      "desc": "Traditionella recept från Madurai"
+    },
+    "fresh": {
+      "title": "Färska Råvaror",
+      "desc": "Kryddor av högsta kvalitet"
+    },
+    "chefs": {
+      "title": "Mästerkockar",
+      "desc": "Decennier av kulinarisk excellens"
+    }
+  },
+  "sections": {
+    "chefs_recommended": {
+      "badge": "Signaturrätter",
+      "title": "Kockens Val",
+      "subtitle": "Våra mest älskade rätter, handplockade för en autentisk upplevelse",
+      "curated": "Utvald Excellens",
+      "view_details": "Visa Detaljer",
+      "view_full_menu": "Visa Hela Menyn"
+    },
+    "menu": {
+      "title": "Vår Meny",
+      "subtitle": "Utforska vårt breda utbud av autentiska rätter",
+      "filter_all": "Alla",
+      "search_placeholder": "Sök efter rätter...",
+      "no_results": "Inga rätter hittades.",
+      "price": "Pris"
+    },
+    "feedback": {
+      "trigger": "Feedback",
+      "title": "Vi värdesätter din åsikt",
+      "subtitle": "Hjälp oss förbättra Taste of Madurai. Dela din upplevelse!",
+      "rate_label": "Betygsätt Upplevelse",
+      "message_label": "Din Feedback",
+      "email_label": "E-post",
+      "phone_label": "Telefon",
+      "optional": "(frivilligt)",
+      "send": "Skicka Feedback",
+      "sending": "Skickar...",
+      "cancel": "Avbryt",
+      "success_title": "Tack!",
+      "success_msg": "Vi läser varje meddelande personligen. Din feedback hjälper oss växa.",
+      "close": "Stäng"
+    }
+  },
+  "footer": {
+    "brand_desc": "Vi tar den autentiska smaken av Madurai till Sverige. Upplev kulinarisk excellens i varje tugga.",
+    "quick_links": "Snabblänkar",
+    "contact": "Kontakta Oss",
+    "social": "Följ Oss",
+    "rights": "Alla rättigheter förbehållna."
+  },
+  "common": {
+    "loading": "Laddar...",
+    "error": "Något gick fel",
+    "not_found": "Sidan hittades inte",
+    "back_home": "Tillbaka till Hem",
+    "open": "Öppet",
+    "closed": "Stängt",
+    "sek": "kr"
+  },
+  "content": {
+    "promise": {
+      "title": "Vårt Löfte",
+      "items": [
+        "Autentiska Recept från Madurai",
+        "Färska Ingredienser av Hög Kvalitet",
+        "Inga Artificiella Färger eller Konserveringsmedel",
+        "Tillagat med Kärlek & Tradition"
+      ],
+      "cta": {
+        "menu": "Se Meny",
+        "contact": "Kontakta Oss"
+      }
+    },
+    "founders": {
+      "title": "Från Vår Familj till Er",
+      "description": "Född ur en längtan efter de autentiska smakerna hemifrån, grundades Taste of Madurai för att ta med det livfulla kulinariska arvet från Tamil Nadu till Stockholm. Varje rätt vi serverar bär arvet från våra förfäder.",
+      "established": "Etablerad 2024"
+    }
+  }
 }

@@ -1,6 +1,6 @@
-// src/components/FeedbackPopup.jsx
-import React, { useMemo, useState } from "react";
-import { Star, MessageSquare, Send, X } from "lucide-react";
+// src/pages/website/Feedback.jsx
+import React, { useState } from "react";
+import { MessageSquare, Send, X, Star } from "lucide-react";
 import {
   Dialog,
   DialogTrigger,
@@ -13,63 +13,39 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+
 import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "react-i18next";
 
-const COLORS = {
-  dark: "#253428",
-  sage: "#728175",
-  sand: "#CDBF9C",
-};
-
-// Replace your StarRating with this version
+// Lucide Star Rating Component
 function StarRating({ value, onChange, size = 28 }) {
-  const [hover, setHover] = React.useState(0);
+  const [hover, setHover] = useState(0);
   const stars = [1, 2, 3, 4, 5];
 
-  const SAND = "yellow"; // use yellow for fill
-  const GRAY = "#D1D5DB"; // tailwind gray-300
-
   return (
-    <div className="flex items-center gap-2" role="radiogroup" aria-label="Rating">
+    <div className="flex items-center gap-1.5 sm:gap-2">
       {stars.map((n) => {
         const active = n <= (hover || value);
         return (
           <button
             key={n}
             type="button"
-            role="radio"
-            aria-checked={n === value}
             onClick={() => onChange(n)}
             onMouseEnter={() => setHover(n)}
             onMouseLeave={() => setHover(0)}
             onFocus={() => setHover(n)}
             onBlur={() => setHover(0)}
-            className="p-0.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-            style={{ lineHeight: 0 }}
+            className="focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded-full transition-transform hover:scale-110"
             title={`${n} star${n > 1 ? "s" : ""}`}
           >
-            {/* Inline SVG star with real fill + stroke */}
-            <svg
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{
-                width: size,
-                height: size,
-                transition: "filter 200ms ease, transform 150ms ease",
-                filter: active ? "drop-shadow(0 0 8px rgba(205,191,156,0.9))" : "none",
-                transform: active ? "translateY(-0.5px)" : "none",
-              }}
-              fill={active ? SAND : "none"}
-              stroke={active ? SAND : GRAY}
-              strokeWidth="1.5"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              {/* clean 5-point star path */}
-              <path d="M12 2.6l2.63 5.33 5.89.86-4.26 4.15 1 5.86L12 16.92 6.74 18.8l1-5.86L3.48 8.79l5.89-.86L12 2.6z" />
-            </svg>
+            <Star
+              size={size}
+              className={`transition-colors duration-200 ${
+                active
+                  ? "fill-brand-secondary text-brand-secondary" // Orange/Gold filled
+                  : "fill-transparent text-gray-300" // Gray empty
+              }`}
+            />
           </button>
         );
       })}
@@ -77,9 +53,8 @@ function StarRating({ value, onChange, size = 28 }) {
   );
 }
 
-
-
 export default function FeedbackPopup() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(5);
   const [form, setForm] = useState({ message: "", email: "", phone: "" });
@@ -95,8 +70,7 @@ export default function FeedbackPopup() {
 
     try {
       setSubmitting(true);
-      // TODO: wire this to your backend (Node/Express) or Google Sheets.
-      // await fetch("/api/feedback", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rating, ...form }) });
+      // Simulate API call
       await new Promise((r) => setTimeout(r, 700));
       setDone(true);
       setForm({ message: "", email: "", phone: "" });
@@ -119,219 +93,157 @@ export default function FeedbackPopup() {
         if (!v) setDone(false);
       }}
     >
-      {/* Floating Pill Trigger */}
+      {/* Trigger Button - Matches Site Theme */}
       <DialogTrigger asChild>
         <button
-          className="fixed bottom-6 right-6 z-50 group rounded-full px-4 py-2 shadow-md cutive-font"
-          style={{
-            backgroundColor: COLORS.dark,
-            color: COLORS.sand,
-          }}
+          className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 group bg-brand-primary text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 font-cutive border border-white/10"
           aria-label="Open feedback"
         >
-          <span className="inline-flex items-center gap-2">
-            <MessageSquare size={18} className="opacity-90" />
-            <span className="text-sm font-semibold">Feedback</span>
-          </span>
-          <span
-            className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition"
-            style={{ boxShadow: `0 0 0 6px ${COLORS.sand}22` }}
-          />
+          <MessageSquare size={20} className="fill-white/20" />
+          <span className="font-bold text-sm hidden sm:inline">Feedback</span>
+
+          {/* Pulse Effect */}
+          <span className="absolute inset-0 rounded-full animate-ping bg-brand-primary/50 -z-10" />
         </button>
       </DialogTrigger>
 
-      {/* Dialog Content */}
-      <DialogContent
-        className="w-full sm:max-w-md p-0 overflow-hidden rounded-2xl"
-        style={{
-          borderColor: `${COLORS.sage}40`,
-          background: "white",
-        }}
-      >
+      {/* Modern Modal Design */}
+      <DialogContent className="max-w-md w-full p-0 overflow-hidden border-none bg-white rounded-3xl shadow-2xl">
         <div className="relative">
-          {/* Top Accent */}
-          <div
-            className="h-1.5 w-full"
-            style={{
-              background: `linear-gradient(90deg, ${COLORS.dark}, ${COLORS.sage}, ${COLORS.dark})`,
-            }}
-          />
+          {/* Header Gradient */}
+          <div className="h-2 w-full bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-primary" />
 
-          <DialogHeader className="px-6 pt-5">
-            <DialogTitle
-              className="cutive-font text-xl"
-              style={{ color: COLORS.dark }}
-            >
-              We value your thoughts
+          <DialogHeader className="px-8 pt-8 pb-2 text-left">
+            <DialogTitle className="font-cutive text-2xl font-bold text-brand-dark">
+              {t("sections.feedback.title")}
             </DialogTitle>
-            <DialogDescription
-              className="cutive-font text-sm"
-              style={{ color: `${COLORS.sage}` }}
-            >
-              Help us bring authentic Madurai flavors to Sweden—share quick
-              feedback.
+            <DialogDescription className="text-brand-dark/60 mt-1 font-sans">
+              {t("sections.feedback.subtitle")}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="px-6 pt-4 pb-6">
+          <div className="px-8 pb-8 pt-4">
             {done ? (
-              <div className="text-center py-8">
-                <div
-                  className="mx-auto mb-3 h-12 w-12 rounded-full flex items-center justify-center"
-                  style={{
-                    backgroundColor: `${COLORS.sand}55`,
-                    color: COLORS.dark,
-                  }}
-                >
-                  <Send size={20} />
+              <div className="text-center py-12 flex flex-col items-center animate-in fade-in zoom-in duration-300">
+                <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-600 shadow-sm">
+                  <Send size={28} className="-ml-1 translate-y-0.5" />
                 </div>
-                <p
-                  className="cutive-font text-base"
-                  style={{ color: COLORS.dark }}
-                >
-                  Thank you! உங்கள் கருத்துக்கு நன்றி 🙏
+                <h3 className="font-cutive text-xl font-bold text-brand-dark mb-2">
+                  Thank You!
+                </h3>
+                <p className="text-brand-dark/60 mb-8 max-w-[200px] text-sm">
+                  We verify every message personally. Your feedback helps us
+                  grow.
                 </p>
-                <p
-                  className="cutive-font text-sm mt-1"
-                  style={{ color: COLORS.sage }}
+                <Button
+                  onClick={ResetAndClose}
+                  className="bg-brand-dark text-white hover:bg-black rounded-xl px-8 w-full font-bold h-12"
                 >
-                  We read every message.
-                </p>
-                <div className="mt-6">
-                  <Button
-                    onClick={ResetAndClose}
-                    className="cutive-font"
-                    style={{
-                      backgroundColor: COLORS.dark,
-                      color: COLORS.sand,
-                    }}
-                  >
-                    Close
-                  </Button>
-                </div>
+                  Close
+                </Button>
               </div>
             ) : (
-              <form onSubmit={onSubmit} className="space-y-5">
+              <form onSubmit={onSubmit} className="space-y-6">
                 {/* Rating */}
-                <div className="space-y-2">
-                  <Label
-                    className="cutive-font text-sm"
-                    style={{ color: COLORS.dark }}
-                  >
-                    Rate your experience
+                <div className="space-y-3 bg-brand-cream/50 p-4 rounded-2xl border border-brand-dark/5">
+                  <Label className="text-xs font-bold uppercase tracking-wider text-brand-dark/50">
+                    {t("sections.feedback.rate_label")}
                   </Label>
-                  <StarRating value={rating} onChange={setRating} />
+                  <div className="flex justify-center py-2">
+                    <StarRating value={rating} onChange={setRating} size={32} />
+                  </div>
                 </div>
-
-                <Separator
-                  className="my-1"
-                  style={{ backgroundColor: `${COLORS.sand}66` }}
-                />
 
                 {/* Message */}
                 <div className="space-y-2">
                   <Label
                     htmlFor="message"
-                    className="cutive-font text-sm"
-                    style={{ color: COLORS.dark }}
+                    className="text-sm font-bold text-brand-dark"
                   >
-                    Your feedback
+                    {t("sections.feedback.message_label")}{" "}
+                    <span className="text-red-500">*</span>
                   </Label>
                   <Textarea
                     id="message"
                     name="message"
-                    placeholder="What did you love? What can we improve?"
+                    placeholder="Tell us what you loved or how we can improve..."
                     value={form.message}
                     onChange={onChange}
-                    className="cutive-font min-h-[110px] resize-none focus-visible:ring-2"
-                    style={{
-                      borderColor: `${COLORS.sage}66`,
-                    }}
+                    className="min-h-[120px] resize-none rounded-xl border-gray-200 bg-gray-50/50 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all placeholder:text-gray-400 font-sans"
                     required
                   />
                 </div>
 
-                {/* Contact (optional) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Contact (Optional) */}
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label
                       htmlFor="email"
-                      className="cutive-font text-sm"
-                      style={{ color: COLORS.dark }}
+                      className="text-sm font-bold text-brand-dark"
                     >
-                      Email (optional)
+                      {t("sections.feedback.email_label")}{" "}
+                      <span className="text-gray-400 font-normal text-xs">
+                        {t("sections.feedback.optional")}
+                      </span>
                     </Label>
                     <Input
                       id="email"
                       name="email"
                       type="email"
+                      placeholder="john@doe.com"
                       value={form.email}
                       onChange={onChange}
-                      placeholder="you@example.com"
-                      className="cutive-font focus-visible:ring-2"
-                      style={{
-                        borderColor: `${COLORS.sage}66`,
-                      }}
+                      className="rounded-xl border-gray-200 bg-gray-50/50 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all h-11"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label
                       htmlFor="phone"
-                      className="cutive-font text-sm"
-                      style={{ color: COLORS.dark }}
+                      className="text-sm font-bold text-brand-dark"
                     >
-                      Phone (optional)
+                      {t("sections.feedback.phone_label")}{" "}
+                      <span className="text-gray-400 font-normal text-xs">
+                        {t("sections.feedback.optional")}
+                      </span>
                     </Label>
                     <Input
                       id="phone"
                       name="phone"
+                      placeholder="+46..."
                       value={form.phone}
                       onChange={onChange}
-                      placeholder="+46 ..."
-                      className="cutive-font focus-visible:ring-2"
-                      style={{
-                        borderColor: `${COLORS.sage}66`,
-                      }}
+                      className="rounded-xl border-gray-200 bg-gray-50/50 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all h-11"
                     />
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-between pt-1">
+                <div className="flex items-center gap-3 pt-2">
                   <DialogClose asChild>
-                    <button
+                    <Button
                       type="button"
-                      className="cutive-font text-sm underline decoration-dotted"
-                      style={{ color: COLORS.sage }}
+                      variant="ghost"
+                      className="flex-1 rounded-xl text-brand-dark/60 hover:text-brand-dark hover:bg-gray-100 font-bold"
                     >
-                      Maybe later
-                    </button>
+                      {t("sections.feedback.cancel")}
+                    </Button>
                   </DialogClose>
-
                   <Button
                     type="submit"
                     disabled={submitting || !form.message.trim()}
-                    className="cutive-font inline-flex items-center gap-2"
-                    style={{
-                      backgroundColor: COLORS.dark,
-                      color: COLORS.sand,
-                    }}
+                    className="flex-[2] rounded-xl bg-brand-primary hover:bg-red-700 text-white font-bold h-12 shadow-lg hover:shadow-brand-primary/20 transition-all disabled:opacity-50 disabled:shadow-none"
                   >
-                    {submitting ? "Sending..." : "Send Feedback"}
-                    <Send size={16} />
+                    {submitting
+                      ? t("sections.feedback.sending")
+                      : t("sections.feedback.send")}
                   </Button>
                 </div>
               </form>
             )}
           </div>
 
-          {/* Close (X) */}
-          <DialogClose
-            className="absolute top-3 right-3 inline-flex h-8 w-8 items-center justify-center rounded-full"
-            aria-label="Close"
-            style={{ color: COLORS.sage, backgroundColor: "transparent" }}
-          >
-            <X size={18} />
+          <DialogClose className="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all">
+            <X size={20} />
           </DialogClose>
         </div>
       </DialogContent>

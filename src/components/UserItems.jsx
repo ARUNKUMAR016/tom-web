@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { listFoodItems } from "../api/foodApi";
 import { Link } from "react-router-dom";
 import { ImageOff } from "lucide-react";
+import { resolveImage } from "@/lib/imageUtils";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -14,7 +15,10 @@ function VegMark({ type = "veg", className = "" }) {
       style={{ width: 16, height: 16, color: isVeg ? "#17803a" : "#b2332a" }}
       title={isVeg ? "Veg" : "Non-veg"}
     >
-      <span className="rounded-full" style={{ width: 8, height: 8, background: "currentColor" }} />
+      <span
+        className="rounded-full"
+        style={{ width: 8, height: 8, background: "currentColor" }}
+      />
     </span>
   );
 }
@@ -75,8 +79,12 @@ export default function UserItems() {
         <div className="mx-auto w-12 rounded-full bg-white p-3 shadow">
           <span className="block text-xl">🪔</span>
         </div>
-        <h3 className="mt-3 text-lg font-semibold text-slate-800">Menu will be served shortly</h3>
-        <p className="text-sm text-slate-600">Please check back in a little while.</p>
+        <h3 className="mt-3 text-lg font-semibold text-slate-800">
+          Menu will be served shortly
+        </h3>
+        <p className="text-sm text-slate-600">
+          Please check back in a little while.
+        </p>
       </section>
     );
   }
@@ -90,11 +98,15 @@ export default function UserItems() {
     >
       {/* Section heading with Tamil subhead */}
       <header className="mb-10">
-        <p className="text-[13px] tracking-[0.2em] font-semibold text-[#7d1a1a]">TASTE OF MADURAI</p>
+        <p className="text-[13px] tracking-[0.2em] font-semibold text-[#7d1a1a]">
+          TASTE OF MADURAI
+        </p>
         <h2 className="mt-1 font-serif text-3xl md:text-4xl font-bold text-slate-900">
           Signature Dishes
         </h2>
-        <p className="mt-1 text-sm text-slate-600">தமிழ் நாட்டு சுவைகள் • Flavours of Tamil Nadu</p>
+        <p className="mt-1 text-sm text-slate-600">
+          தமிழ் நாட்டு சுவைகள் • Flavours of Tamil Nadu
+        </p>
       </header>
 
       {/* two-column elegant list, no “cards” */}
@@ -112,7 +124,7 @@ export default function UserItems() {
               <div className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-2xl ring-1 ring-amber-200/70">
                 {it.imageUrl ? (
                   <img
-                    src={`${API_BASE}${it.imageUrl}`}
+                    src={resolveImage(it.imageUrl)}
                     alt={it.name}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     onError={(e) => {
@@ -123,7 +135,9 @@ export default function UserItems() {
                   />
                 ) : null}
                 <div
-                  className={`${it.imageUrl ? "hidden" : "flex"} h-full w-full items-center justify-center bg-amber-50`}
+                  className={`${
+                    it.imageUrl ? "hidden" : "flex"
+                  } h-full w-full items-center justify-center bg-amber-50`}
                 >
                   <ImageOff className="h-6 w-6 text-slate-400" />
                 </div>
@@ -138,7 +152,10 @@ export default function UserItems() {
                   {it.glutenFree && <Chip>🚫🌾 GF</Chip>}
                 </div>
                 <div className="absolute bottom-2 right-2 rounded-full bg-[#FF5200]/95 px-2.5 py-0.5 text-[12px] font-semibold text-white shadow">
-                  ₹{Number(it.rate).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                  ₹
+                  {Number(it.rate).toLocaleString("en-IN", {
+                    maximumFractionDigits: 2,
+                  })}
                 </div>
               </div>
 

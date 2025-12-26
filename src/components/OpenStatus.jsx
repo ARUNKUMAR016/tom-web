@@ -1,14 +1,11 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
+import { getSettings } from "../api/settingsApi";
 
 // Configure your hours here (Europe/Stockholm time)
 const TIMEZONE = "Europe/Stockholm";
-// JS getDay(): 0 Sun, 6 Sat
-const WEEKLY_HOURS = [
-  { day: 6, open: "10:00", close: "19:00", label: "Saturday" },
-  { day: 0, open: "10:00", close: "19:00", label: "Sunday" },
-];
 
 function toMinutes(hhmm) {
+  if (!hhmm) return 0;
   const [h, m] = hhmm.split(":").map(Number);
   return h * 60 + (m || 0);
 }
@@ -20,49 +17,70 @@ function nowInMinutes(timeZone) {
     minute: "2-digit",
     hour12: false,
   });
-  const parts = Object.fromEntries(fmt.formatToParts(new Date()).map(p => [p.type, p.value]));
+  const parts = Object.fromEntries(
+    fmt.formatToParts(new Date()).map((p) => [p.type, p.value])
+  );
   return toMinutes(`${parts.hour}:${parts.minute}`);
 }
 
 function getDayInTZ(timeZone) {
-  return Number(new Intl.DateTimeFormat("en-GB", { timeZone, weekday: "short" })
-    .formatToParts(new Date())
-    .find(p => p.type === "weekday").value
-    // Map "Sun".."Sat" to JS 0..6
-    .replace(/.*/, (w) => ({Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6})[w]));
+  return Number(
+    new Intl.DateTimeFormat("en-GB", { timeZone, weekday: "short" })
+      .formatToParts(new Date())
+      .find((p) => p.type === "weekday")
+      .value // Map "Sun".."Sat" to JS 0..6
+      .replace(/.*/, (w) =>
+        ({ Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }[w])
+      )
+  );
 }
 
+const DAYS_MAP = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 export default function OpenStatus({ className = "" }) {
-  const { isOpen, current, next } = useMemo(() => {
-    const day = getDayInTZ(TIMEZONE);
-    const mins = nowInMinutes(TIMEZONE);
+  const [settings, setSettings] = useState(null);
 
-    const today = WEEKLY_HOURS.find(h => h.day === day);
-    const openNow = today
-      ? mins >= toMinutes(today.open) && mins < toMinutes(today.close)
-      : false;
-
-    // Find the next opening slot
-    const order = Array.from({ length: 7 }, (_, i) => (day + i) % 7);
-    let nextSlot = null;
-    for (const d of order) {
-      const slot = WEEKLY_HOURS.find(h => h.day === d);
-      if (!slot) continue;
-      if (d === day) {
-        if (mins < toMinutes(slot.open)) { nextSlot = slot; break; }
-        // if already open, the “next” is next week’s same day
-        if (openNow) {
-          // next week
-          nextSlot = slot;
-          break;
-        }
-      } else { nextSlot = slot; break; }
-    }
-
-    return { isOpen: openNow, current: today || null, next: nextSlot || null };
+  useEffect(() => {
+    getSettings().then(setSettings).catch(console.error);
   }, []);
 
-  const timeRange = (slot) => slot ? `${slot.open}–${slot.close}` : "";
+  const status = useMemo(() => {
+    if (!settings) return { isOpen: false, text: "Loading..." };
+
+    // 1. Manual Override
+    if (settings.isShopOpen === false) {
+      return { isOpen: false, text: "Closed" };
+    }
+
+    const dayIndex = getDayInTZ(TIMEZONE);
+    const dayName = DAYS_MAP[dayIndex];
+    const mins = nowInMinutes(TIMEZONE);
+
+    // 2. Special Closed Dates
+    const todayStr = new Date().toISOString().split("T")[0];
+    if (settings.specialClosedDates?.some((d) => d.startsWith(todayStr))) {
+      return { isOpen: false, text: "Closed (Holiday)" };
+    }
+
+    // 3. Weekly Closed Days
+    if (settings.closedDays?.includes(dayName)) {
+      return { isOpen: false, text: "Closed Today" };
+    }
+
+    // 4. Time Check
+    const openMins = toMinutes(settings.openingTime);
+    const closeMins = toMinutes(settings.closingTime);
+
+    if (mins >= openMins && mins < closeMins) {
+      return { isOpen: true, text: "Open now", detail: `• Closes ${settings.closingTime}` };
+    } else if (mins < openMins) {
+      return { isOpen: false, text: "Closed", detail: `• Opens ${settings.openingTime}` };
+    } else {
+      return { isOpen: false, text: "Closed", detail: `• Opens tomorrow` };
+    }
+  }, [settings]);
+
+  if (!settings) return null;
 
   return (
     <div
@@ -71,20 +89,14 @@ export default function OpenStatus({ className = "" }) {
     >
       <span
         className={`inline-block h-2.5 w-2.5 rounded-full ${
-          isOpen ? "bg-emerald-500" : "bg-rose-500"
+          status.isOpen ? "bg-emerald-500" : "bg-rose-500"
         }`}
         aria-hidden
       />
-      <span className={`${isOpen ? "text-emerald-600" : "text-rose-500"}`}>
-        {isOpen ? "Open now" : "Closed"}
+      <span className={`${status.isOpen ? "text-emerald-600" : "text-rose-500"}`}>
+        {status.text}
       </span>
-      <span className="text-[#728175]">
-        {isOpen
-          ? `• Closes ${current?.close || ""}`
-          : next
-            ? `• Opens ${next.label} ${next.open}`
-            : ""}
-      </span>
+      <span className="text-[#728175]">{status.detail}</span>
     </div>
   );
 }
