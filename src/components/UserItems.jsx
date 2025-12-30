@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { listFoodItems } from "../api/foodApi";
+import { listFoodItems } from "../api/foodapi";
 import { Link } from "react-router-dom";
 import { ImageOff } from "lucide-react";
 import { resolveImage } from "@/lib/imageUtils";

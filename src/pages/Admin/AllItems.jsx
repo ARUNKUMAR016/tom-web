@@ -1,10 +1,11 @@
 // src/pages/AllItems.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   listFoodItems,
   deleteFoodItem,
   updateFoodItem,
-} from "../../api/foodApi";
+} from "../../api/foodapi";
 import { Link } from "react-router-dom";
 import {
   Pencil,
@@ -16,9 +17,11 @@ import {
   ImageOff,
   Search,
   Flame,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 import { resolveImage } from "@/lib/imageUtils";
+import { Switch } from "@/components/ui/switch";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -119,10 +122,11 @@ export default function AllItems() {
           typeof it.spiceLevel === "number" && it.spiceLevel >= 0
             ? it.spiceLevel
             : 0,
+        isChefRecommended: !!it.isChefRecommended,
         _ingredientInput: "",
         // Image fields:
         imageFile: null,
-        imagePreview: resolveImage(it.imageUrl) || null,
+        imagePreview: resolveImage(it.imageUrl, 400) || null,
         hasNewImage: false,
       },
     }));
@@ -160,6 +164,7 @@ export default function AllItems() {
         glutenFree: !!payload.glutenFree,
         category: payload.category,
         spiceLevel: Number(payload.spiceLevel ?? 0),
+        isChefRecommended: !!payload.isChefRecommended,
         ingredients: (payload.ingredients || [])
           .map((g) => String(g).trim())
           .filter(Boolean),
@@ -207,6 +212,32 @@ export default function AllItems() {
     }
   };
 
+  // ───────────────────────── Availability Toggle
+  const toggleAvailability = async (id, currentStatus) => {
+    // Optimistic update
+    const prevItems = [...items];
+    setItems((current) =>
+      current.map((item) => {
+        if (String(item.id || item._id) === id) {
+          return { ...item, isAvailable: !currentStatus };
+        }
+        return item;
+      })
+    );
+
+    try {
+      await updateFoodItem(id, { isAvailable: !currentStatus });
+      toast.success(
+        !currentStatus ? "Marked as Available" : "Marked as Unavailable"
+      );
+    } catch (e) {
+      // Revert on failure
+      setItems(prevItems);
+      toast.error("Failed to update status");
+      console.error(e);
+    }
+  };
+
   // --- Ingredients (per edited card) ---
   const addIngredient = (id) => {
     setEdit((s) => {
@@ -247,14 +278,14 @@ export default function AllItems() {
       {/* Page Header */}
       <header className="flex items-center justify-between gap-4 py-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neon-gold/10 text-neon-gold border border-neon-gold/20 shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-primary/10 text-brand-primary border border-brand-primary/20 shadow-sm">
             <Search className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white font-cutive">
+            <h1 className="text-2xl font-bold text-brand-dark font-display uppercase tracking-tight">
               All Food Items
             </h1>
-            <p className="text-sm text-white/40">
+            <p className="text-sm text-brand-dark/40 font-medium">
               Manage every dish — edit, filter, and remove.
             </p>
           </div>
@@ -271,7 +302,7 @@ export default function AllItems() {
 
           <Link
             to="/admin/items/new"
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all bg-neon-gold text-black hover:bg-neon-gold/90 hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)]"
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all bg-brand-primary text-white hover:bg-brand-primary/90 hover:scale-105 shadow-lg shadow-brand-primary/20"
           >
             <PlusCircle className="h-4 w-4" />
             Add New
@@ -280,22 +311,22 @@ export default function AllItems() {
       </header>
 
       {/* Controls */}
-      <div className="mb-8 flex flex-wrap items-center gap-4 p-4 rounded-2xl bg-admin-card backdrop-blur-md border border-admin-border">
+      <div className="mb-8 flex flex-wrap items-center gap-4 p-4 rounded-2xl bg-white border border-brand-dark/5 shadow-sm">
         {/* Search */}
         <div className="relative flex-1 min-w-[240px]">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-dark/30" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search by name, ingredient, description…"
-            className="w-full rounded-xl pl-11 pr-4 py-3 text-sm bg-black/40 border border-admin-border text-white placeholder-white/20 focus:outline-none focus:border-neon-gold/50 focus:ring-1 focus:ring-neon-gold/50 transition-all"
+            className="w-full rounded-xl pl-11 pr-4 py-3 text-sm bg-brand-cream/30 border border-brand-dark/10 text-brand-dark placeholder-brand-dark/30 focus:outline-none focus:border-brand-primary/50 focus:ring-1 focus:ring-brand-primary/50 transition-all font-medium"
           />
         </div>
 
         {/* Filters */}
         <div className="flex flex-wrap gap-3">
           <select
-            className="rounded-xl px-4 py-3 text-sm bg-black/40 border border-admin-border text-white/80 focus:outline-none focus:border-neon-gold/50 cursor-pointer hover:bg-black/60 transition-colors"
+            className="rounded-xl px-4 py-3 text-sm bg-white border border-brand-dark/10 text-brand-dark focus:outline-none focus:border-brand-primary/50 cursor-pointer hover:bg-brand-cream transition-colors font-medium shadow-sm"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
           >
@@ -305,7 +336,7 @@ export default function AllItems() {
           </select>
 
           <select
-            className="rounded-xl px-4 py-3 text-sm bg-black/40 border border-admin-border text-white/80 focus:outline-none focus:border-neon-gold/50 cursor-pointer hover:bg-black/60 transition-colors"
+            className="rounded-xl px-4 py-3 text-sm bg-white border border-brand-dark/10 text-brand-dark focus:outline-none focus:border-brand-primary/50 cursor-pointer hover:bg-brand-cream transition-colors font-medium shadow-sm"
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
           >
@@ -319,15 +350,15 @@ export default function AllItems() {
 
         {/* Toggles */}
         <div className="flex items-center gap-4 px-2">
-          <label className="inline-flex items-center gap-2 text-sm text-white/80 cursor-pointer group">
+          <label className="inline-flex items-center gap-2 text-sm text-brand-dark font-medium cursor-pointer group">
             <div
               className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
                 filterVegan
-                  ? "bg-neon-green border-neon-green"
-                  : "border-white/20 group-hover:border-white/40"
+                  ? "bg-emerald-500 border-emerald-500"
+                  : "border-brand-dark/20 group-hover:border-brand-dark/40"
               }`}
             >
-              {filterVegan && <div className="w-2 h-2 bg-black rounded-sm" />}
+              {filterVegan && <Check className="w-3 h-3 text-white" />}
             </div>
             <input
               type="checkbox"
@@ -338,15 +369,15 @@ export default function AllItems() {
             Vegan
           </label>
 
-          <label className="inline-flex items-center gap-2 text-sm text-white/80 cursor-pointer group">
+          <label className="inline-flex items-center gap-2 text-sm text-brand-dark font-medium cursor-pointer group">
             <div
               className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
                 filterGluten
-                  ? "bg-neon-blue border-neon-blue"
-                  : "border-white/20 group-hover:border-white/40"
+                  ? "bg-blue-500 border-blue-500"
+                  : "border-brand-dark/20 group-hover:border-brand-dark/40"
               }`}
             >
-              {filterGluten && <div className="w-2 h-2 bg-black rounded-sm" />}
+              {filterGluten && <Check className="w-3 h-3 text-white" />}
             </div>
             <input
               type="checkbox"
@@ -372,12 +403,12 @@ export default function AllItems() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="rounded-3xl p-4 bg-admin-card border border-admin-border animate-pulse"
+              className="rounded-3xl p-4 bg-white border border-brand-dark/5 animate-pulse shadow-sm"
             >
-              <div className="h-48 w-full rounded-2xl bg-white/5 mb-4" />
-              <div className="h-6 w-2/3 bg-white/5 rounded mb-2" />
-              <div className="h-4 w-full bg-white/5 rounded mb-2" />
-              <div className="h-4 w-1/2 bg-white/5 rounded" />
+              <div className="h-48 w-full rounded-2xl bg-brand-cream mb-4" />
+              <div className="h-6 w-2/3 bg-brand-cream rounded mb-2" />
+              <div className="h-4 w-full bg-brand-cream rounded mb-2" />
+              <div className="h-4 w-1/2 bg-brand-cream rounded" />
             </div>
           ))}
         </div>
@@ -398,14 +429,14 @@ export default function AllItems() {
             return (
               <div
                 key={id}
-                className="group relative overflow-hidden rounded-3xl bg-admin-card backdrop-blur-md border border-admin-border transition-all duration-300 hover:-translate-y-1 hover:border-neon-gold/30 hover:shadow-[0_0_30px_rgba(0,0,0,0.3)]"
+                className="group relative overflow-hidden rounded-3xl bg-white border border-brand-dark/5 premium-shadow-hover"
               >
                 {/* Image */}
                 <div className="relative h-52 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
                   {it.imageUrl ? (
                     <img
-                      src={resolveImage(it.imageUrl)}
+                      src={resolveImage(it.imageUrl, 400)}
                       alt={it.name}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                       onError={(e) => {
@@ -425,7 +456,7 @@ export default function AllItems() {
                   </div>
 
                   {/* Price chip */}
-                  <div className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-neon-gold font-bold text-sm shadow-lg">
+                  <div className="absolute top-4 right-4 z-20 px-4 py-2 rounded-full bg-brand-secondary text-brand-dark font-display font-bold text-sm shadow-xl border border-white/40 backdrop-blur-md">
                     {new Intl.NumberFormat("sv-SE", {
                       style: "currency",
                       currency: "SEK",
@@ -435,10 +466,10 @@ export default function AllItems() {
                   {/* Type Badge */}
                   <div className="absolute top-4 left-4 z-20">
                     <span
-                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${
                         it.type === "veg"
-                          ? "bg-neon-green/10 text-neon-green border-neon-green/20"
-                          : "bg-red-500/10 text-red-400 border-red-500/20"
+                          ? "bg-emerald-500/90 text-white border-white/20"
+                          : "bg-brand-primary/90 text-white border-white/20"
                       }`}
                     >
                       {it.type}
@@ -449,53 +480,71 @@ export default function AllItems() {
                 {/* Body */}
                 <div className="p-6 relative z-20">
                   <div className="flex items-start justify-between gap-4 mb-3">
-                    <h2 className="text-xl font-bold text-white leading-tight font-cutive group-hover:text-neon-gold transition-colors">
+                    <h2 className="text-xl font-bold text-brand-dark leading-tight font-display uppercase tracking-tight group-hover:text-brand-primary transition-colors">
                       {it.name}
                     </h2>
+                    <div
+                      className="flex items-center gap-2"
+                      title="Toggle Availability"
+                    >
+                      <Switch
+                        checked={!!it.isAvailable}
+                        onCheckedChange={() =>
+                          toggleAvailability(id, !!it.isAvailable)
+                        }
+                        className="data-[state=checked]:bg-green-500"
+                      />
+                    </div>
                   </div>
 
-                  <p className="text-sm text-white/60 line-clamp-2 mb-4 h-10">
+                  <p className="text-sm text-brand-dark/60 font-medium line-clamp-2 mb-4 h-10">
                     {it.description}
                   </p>
 
                   <div className="flex flex-wrap items-center gap-2 mb-6">
                     {categoryLabel && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-md bg-white/5 border border-white/10 text-xs text-white/60">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-brand-cream border border-brand-dark/5 text-[10px] font-bold text-brand-dark/60 uppercase tracking-wider">
                         {categoryLabel}
                       </span>
                     )}
 
+                    {it.isChefRecommended && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-brand-secondary/20 border border-brand-secondary/30 text-[10px] font-bold text-brand-secondary uppercase tracking-wider">
+                        ⭐ CHEF'S PICK
+                      </span>
+                    )}
+
                     {typeof it.spiceLevel === "number" && it.spiceLevel > 0 && (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-orange-500/10 border border-orange-500/20 text-xs text-orange-400">
-                        <Flame className="h-3 w-3" />
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-orange-50 border border-orange-100 text-[10px] font-bold text-orange-600 uppercase tracking-wider">
+                        <Flame className="h-3 w-3 fill-orange-500" />
                         {spiceText}
                       </span>
                     )}
 
                     {it.vegan && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-md bg-neon-green/5 border border-neon-green/10 text-xs text-neon-green/80">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-emerald-50 border border-emerald-100 text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
                         Vegan
                       </span>
                     )}
                     {it.glutenFree && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-md bg-neon-blue/5 border border-neon-blue/10 text-xs text-neon-blue/80">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-blue-50 border border-blue-100 text-[10px] font-bold text-blue-600 uppercase tracking-wider">
                         GF
                       </span>
                     )}
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 pt-4 border-t border-white/5">
+                  <div className="flex items-center gap-2 pt-4 border-t border-brand-dark/5">
                     <button
                       onClick={() => startEdit(it)}
-                      className="flex-1 h-10 flex items-center justify-center gap-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 hover:text-white text-sm font-medium transition-colors"
+                      className="flex-1 h-11 flex items-center justify-center gap-2 rounded-xl bg-brand-cream hover:bg-brand-primary hover:text-white text-brand-dark font-bold text-xs uppercase tracking-widest transition-all duration-300"
                     >
                       <Pencil className="h-4 w-4" />
                       Edit
                     </button>
                     <button
                       onClick={() => askDelete(it)}
-                      className="h-10 w-10 flex items-center justify-center rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-colors"
+                      className="h-11 w-11 flex items-center justify-center rounded-xl bg-red-50 hover:bg-red-500 hover:text-white text-red-500 transition-all duration-300 border border-red-100"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -613,347 +662,439 @@ function EditDialog({
 
   if (!state) return null;
 
-  return (
+  const spiceText = SPICE_LABELS[state.spiceLevel] ?? "None";
+  const spiceBar = Array.from({ length: 6 }, (_, i) => i <= state.spiceLevel);
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       onMouseDown={onBackdrop}
     >
       <div
         ref={dialogRef}
-        className="w-full max-w-2xl overflow-hidden rounded-3xl bg-[#1a1c20] border border-white/10 shadow-2xl ring-1 ring-white/5"
+        className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
         onMouseDown={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/5 px-6 py-4 bg-white/5">
-          <h3 className="text-lg font-bold text-white font-cutive">
-            Edit Item
-          </h3>
+        {/* Header - Clean & Minimal */}
+        <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100 bg-white">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary">
+              <Pencil className="h-6 w-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-brand-dark font-display uppercase tracking-wide">
+                Edit Item
+              </h3>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                ID: {id}
+              </p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+            className="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all"
             title="Close"
           >
-            <X className="h-5 w-5" />
+            <X className="h-6 w-6" />
           </button>
         </div>
 
-        {/* Body */}
-        <div className="max-h-[70vh] overflow-y-auto px-6 py-6 custom-scrollbar">
-          <div className="grid gap-6">
-            {/* Image */}
-            <div className="flex items-start gap-6">
-              <div className="w-32 h-32 rounded-2xl overflow-hidden flex items-center justify-center bg-black/40 border border-white/10 relative group">
-                {state.imagePreview ? (
-                  <img
-                    src={state.imagePreview}
-                    alt="preview"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-xs text-white/20">No image</span>
-                )}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Pencil className="h-6 w-6 text-white" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-white/80 mb-2">
-                  Item Image
+        {/* Body - Clean 2-Col Grid */}
+        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-white">
+          <div className="grid lg:grid-cols-12 gap-10">
+            {/* Left Column: Media & Quick Actions (4 cols) */}
+            <div className="lg:col-span-4 space-y-8">
+              {/* Image Preview Card */}
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Dish Image
                 </label>
-                <label className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm cursor-pointer transition-all bg-white/5 border border-white/10 hover:bg-white/10 text-white">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      if (file.size > 5 * 1024 * 1024) {
-                        return alert("Please choose an image under 5 MB.");
-                      }
-                      onPickImage(file);
-                    }}
-                  />
-                  <PlusCircle className="h-4 w-4" />
-                  Change Image
-                </label>
+                <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 group">
+                  {state.imagePreview ? (
+                    <img
+                      src={state.imagePreview}
+                      alt="preview"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-300">
+                      <ImageOff className="w-12 h-12 mb-2" />
+                      <span className="text-sm font-medium">No Image</span>
+                    </div>
+                  )}
 
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (file.size > 5 * 1024 * 1024)
+                          return alert("max 5mb");
+                        onPickImage(file);
+                      }}
+                    />
+                    <Pencil className="w-8 h-8 text-white mb-2" />
+                    <span className="text-white text-xs font-bold uppercase tracking-wider">
+                      Change
+                    </span>
+                  </div>
+                </div>
                 {state.hasNewImage && (
-                  <p className="mt-3 text-xs text-neon-gold">
-                    * New image selected. Save to apply.
+                  <p className="text-center text-xs font-bold text-brand-primary animate-pulse">
+                    * New image selected
                   </p>
                 )}
               </div>
-            </div>
 
-            <div className="grid sm:grid-cols-2 gap-6">
-              {/* Name */}
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-white/60 uppercase tracking-wider">
-                  Name
-                </label>
-                <input
-                  className="w-full rounded-xl px-4 py-3 text-sm bg-black/40 border border-white/10 text-white focus:outline-none focus:border-neon-gold/50 focus:ring-1 focus:ring-neon-gold/50 transition-all"
-                  value={state.name}
-                  onChange={(e) =>
-                    onChange((s) => ({
-                      ...s,
-                      [id]: { ...s[id], name: e.target.value },
-                    }))
-                  }
-                />
-              </div>
-
-              {/* Rate */}
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-white/60 uppercase tracking-wider">
-                  Rate (SEK)
-                </label>
-                <input
-                  type="number"
-                  className="w-full rounded-xl px-4 py-3 text-sm bg-black/40 border border-white/10 text-white focus:outline-none focus:border-neon-gold/50 focus:ring-1 focus:ring-neon-gold/50 transition-all"
-                  value={state.rate}
-                  onChange={(e) =>
-                    onChange((s) => ({
-                      ...s,
-                      [id]: { ...s[id], rate: e.target.value },
-                    }))
-                  }
-                />
-              </div>
-            </div>
-
-            {/* Description */}
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-white/60 uppercase tracking-wider">
-                Description
-              </label>
-              <textarea
-                rows={3}
-                className="w-full rounded-xl px-4 py-3 text-sm bg-black/40 border border-white/10 text-white focus:outline-none focus:border-neon-gold/50 focus:ring-1 focus:ring-neon-gold/50 transition-all resize-none"
-                value={state.description}
-                onChange={(e) =>
-                  onChange((s) => ({
-                    ...s,
-                    [id]: { ...s[id], description: e.target.value },
-                  }))
-                }
-              />
-            </div>
-
-            {/* Type & Category */}
-            <div className="grid sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-white/60 uppercase tracking-wider">
-                  Type
-                </label>
-                <div className="flex gap-4 p-1">
-                  <label className="inline-flex items-center gap-2 cursor-pointer">
-                    <div
-                      className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                        state.type === "veg"
-                          ? "border-neon-green"
-                          : "border-white/20"
-                      }`}
-                    >
-                      {state.type === "veg" && (
-                        <div className="w-2 h-2 rounded-full bg-neon-green" />
-                      )}
-                    </div>
-                    <input
-                      type="radio"
-                      name={`type-${id}`}
-                      className="hidden"
-                      checked={state.type === "veg"}
-                      onChange={() =>
-                        onChange((s) => ({
-                          ...s,
-                          [id]: { ...s[id], type: "veg" },
-                        }))
-                      }
-                    />
-                    <span className="text-sm text-white">Veg</span>
-                  </label>
-                  <label className="inline-flex items-center gap-2 cursor-pointer">
-                    <div
-                      className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                        state.type === "nonveg"
-                          ? "border-red-500"
-                          : "border-white/20"
-                      }`}
-                    >
-                      {state.type === "nonveg" && (
-                        <div className="w-2 h-2 rounded-full bg-red-500" />
-                      )}
-                    </div>
-                    <input
-                      type="radio"
-                      name={`type-${id}`}
-                      className="hidden"
-                      checked={state.type === "nonveg"}
-                      onChange={() =>
-                        onChange((s) => ({
-                          ...s,
-                          [id]: { ...s[id], type: "nonveg" },
-                        }))
-                      }
-                    />
-                    <span className="text-sm text-white">Non-veg</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-white/60 uppercase tracking-wider">
-                  Category
-                </label>
-                <select
-                  className="w-full rounded-xl px-4 py-3 text-sm bg-black/40 border border-white/10 text-white focus:outline-none focus:border-neon-gold/50 focus:ring-1 focus:ring-neon-gold/50 transition-all"
-                  value={state.category}
-                  onChange={(e) =>
-                    onChange((s) => ({
-                      ...s,
-                      [id]: { ...s[id], category: e.target.value },
-                    }))
-                  }
-                >
-                  {CATEGORY_OPTIONS.map((c) => (
-                    <option key={c.value} value={c.value}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Toggles */}
-            <div className="flex gap-6">
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <div
-                  className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                    state.vegan
-                      ? "bg-neon-green border-neon-green"
-                      : "border-white/20 bg-black/40"
-                  }`}
-                >
-                  {state.vegan && (
-                    <div className="w-2.5 h-2.5 bg-black rounded-sm" />
-                  )}
-                </div>
-                <input
-                  type="checkbox"
-                  className="hidden"
-                  checked={state.vegan}
-                  onChange={(e) =>
-                    onChange((s) => ({
-                      ...s,
-                      [id]: { ...s[id], vegan: e.target.checked },
-                    }))
-                  }
-                  disabled={state.type === "nonveg"}
-                />
-                <span
-                  className={`text-sm ${
-                    state.type === "nonveg" ? "text-white/20" : "text-white"
-                  }`}
-                >
-                  Vegan
-                </span>
-              </label>
-
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <div
-                  className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                    state.glutenFree
-                      ? "bg-neon-blue border-neon-blue"
-                      : "border-white/20 bg-black/40"
-                  }`}
-                >
-                  {state.glutenFree && (
-                    <div className="w-2.5 h-2.5 bg-black rounded-sm" />
-                  )}
-                </div>
-                <input
-                  type="checkbox"
-                  className="hidden"
-                  checked={state.glutenFree}
-                  onChange={(e) =>
-                    onChange((s) => ({
-                      ...s,
-                      [id]: { ...s[id], glutenFree: e.target.checked },
-                    }))
-                  }
-                />
-                <span className="text-sm text-white">Gluten-free</span>
-              </label>
-            </div>
-
-            {/* Ingredients */}
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-white/60 uppercase tracking-wider">
-                Ingredients
-              </label>
-              <div className="flex gap-2">
-                <input
-                  className="flex-1 rounded-xl px-4 py-3 text-sm bg-black/40 border border-white/10 text-white focus:outline-none focus:border-neon-gold/50 focus:ring-1 focus:ring-neon-gold/50 transition-all"
-                  placeholder="Add ingredient..."
-                  value={state._ingredientInput || ""}
-                  onChange={(e) =>
-                    onChange((s) => ({
-                      ...s,
-                      [id]: { ...s[id], _ingredientInput: e.target.value },
-                    }))
-                  }
-                  onKeyDown={onIngredientKeyDown}
-                />
-                <button
-                  type="button"
-                  onClick={onAddIngredient}
-                  className="px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
-                >
-                  Add
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {(state.ingredients || []).map((ing, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs bg-white/5 border border-white/10 text-white/80"
-                  >
-                    {ing}
-                    <button
-                      type="button"
-                      onClick={() => onRemoveIngredient(idx)}
-                      className="hover:text-red-400 ml-1"
-                    >
-                      ×
-                    </button>
+              {/* Spice Level Card */}
+              <div className="bg-orange-50/50 rounded-2xl p-5 border border-orange-100/50">
+                <div className="flex items-center gap-2 mb-4">
+                  <Flame className="w-4 h-4 text-orange-500" />
+                  <span className="text-xs font-bold text-orange-700 uppercase tracking-wider">
+                    Spice Level
                   </span>
-                ))}
+                </div>
+                <div className="relative h-12 flex items-center">
+                  <input
+                    type="range"
+                    min="0"
+                    max="5"
+                    step="1"
+                    value={state.spiceLevel}
+                    onChange={(e) =>
+                      onChange((s) => ({
+                        ...s,
+                        [id]: { ...s[id], spiceLevel: Number(e.target.value) },
+                      }))
+                    }
+                    className="absolute inset-0 w-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="w-full flex gap-1 h-3">
+                    {spiceBar.map((filled, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex-1 rounded-full transition-all duration-300 ${
+                          filled
+                            ? idx < 2
+                              ? "bg-green-400"
+                              : idx < 4
+                              ? "bg-yellow-400"
+                              : "bg-red-500"
+                            : "bg-gray-200"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex justify-between items-center text-xs pt-1 font-bold text-orange-900/40">
+                  <span>Mild</span>
+                  <span className="text-orange-600">{spiceText}</span>
+                  <span>Fire</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Form Fields (8 cols) */}
+            <div className="lg:col-span-8 space-y-6">
+              <div className="grid sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Name
+                  </label>
+                  <input
+                    className="w-full rounded-xl px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-brand-primary/50 focus:ring-4 focus:ring-brand-primary/10 transition-all font-bold text-brand-dark"
+                    value={state.name}
+                    placeholder="Item Name"
+                    onChange={(e) =>
+                      onChange((s) => ({
+                        ...s,
+                        [id]: { ...s[id], name: e.target.value },
+                      }))
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Price (SEK)
+                  </label>
+                  <input
+                    type="number"
+                    className="w-full rounded-xl px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-brand-primary/50 focus:ring-4 focus:ring-brand-primary/10 transition-all font-bold text-brand-dark"
+                    value={state.rate}
+                    placeholder="0.00"
+                    onChange={(e) =>
+                      onChange((s) => ({
+                        ...s,
+                        [id]: { ...s[id], rate: e.target.value },
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Description
+                </label>
+                <textarea
+                  rows={3}
+                  className="w-full rounded-xl px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-brand-primary/50 focus:ring-4 focus:ring-brand-primary/10 transition-all font-medium text-brand-dark resize-none"
+                  value={state.description}
+                  placeholder="Describe the dish..."
+                  onChange={(e) =>
+                    onChange((s) => ({
+                      ...s,
+                      [id]: { ...s[id], description: e.target.value },
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-6">
+                {/* Type Toggles */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Type
+                  </label>
+                  <div className="flex bg-gray-100 rounded-xl p-1">
+                    {["veg", "nonveg"].map((t) => (
+                      <button
+                        key={t}
+                        onClick={() =>
+                          onChange((s) => ({
+                            ...s,
+                            [id]: {
+                              ...s[id],
+                              type: t,
+                              vegan: t === "nonveg" ? false : s[id].vegan,
+                            },
+                          }))
+                        }
+                        className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${
+                          state.type === t
+                            ? "bg-white text-brand-dark shadow-sm scale-100"
+                            : "text-gray-400 hover:text-gray-600"
+                        }`}
+                      >
+                        {t === "veg" ? "Vegetarian" : "Non-Veg"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Category
+                  </label>
+                  <select
+                    className="w-full rounded-xl px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-brand-primary/50 focus:ring-4 focus:ring-brand-primary/10 transition-all font-bold text-brand-dark cursor-pointer"
+                    value={state.category}
+                    onChange={(e) =>
+                      onChange((s) => ({
+                        ...s,
+                        [id]: { ...s[id], category: e.target.value },
+                      }))
+                    }
+                  >
+                    {CATEGORY_OPTIONS.map((c) => (
+                      <option key={c.value} value={c.value}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Toggles */}
+              <div className="flex gap-4 pt-2">
+                <label
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all cursor-pointer ${
+                    state.vegan
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-gray-100 hover:border-gray-200"
+                  } ${
+                    state.type === "nonveg"
+                      ? "opacity-50 pointer-events-none"
+                      : ""
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      state.vegan
+                        ? "bg-emerald-500 text-white"
+                        : "bg-gray-200 text-gray-400"
+                    }`}
+                  >
+                    <Check className="w-3 h-3" />
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={state.vegan}
+                    onChange={(e) =>
+                      onChange((s) => ({
+                        ...s,
+                        [id]: { ...s[id], vegan: e.target.checked },
+                      }))
+                    }
+                    disabled={state.type === "nonveg"}
+                    className="hidden"
+                  />
+                  <span
+                    className={`text-xs font-bold uppercase ${
+                      state.vegan ? "text-emerald-700" : "text-gray-400"
+                    }`}
+                  >
+                    Vegan
+                  </span>
+                </label>
+
+                <label
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all cursor-pointer ${
+                    state.glutenFree
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-100 hover:border-gray-200"
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      state.glutenFree
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-400"
+                    }`}
+                  >
+                    <Check className="w-3 h-3" />
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={state.glutenFree}
+                    onChange={(e) =>
+                      onChange((s) => ({
+                        ...s,
+                        [id]: { ...s[id], glutenFree: e.target.checked },
+                      }))
+                    }
+                    className="hidden"
+                  />
+                  <span
+                    className={`text-xs font-bold uppercase ${
+                      state.glutenFree ? "text-blue-700" : "text-gray-400"
+                    }`}
+                  >
+                    Gluten Free
+                  </span>
+                </label>
+
+                <label
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all cursor-pointer ${
+                    state.isChefRecommended
+                      ? "border-brand-secondary bg-brand-secondary/10"
+                      : "border-gray-100 hover:border-gray-200"
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      state.isChefRecommended
+                        ? "bg-brand-secondary text-white"
+                        : "bg-gray-200 text-gray-400"
+                    }`}
+                  >
+                    <Check className="w-3 h-3" />
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={state.isChefRecommended}
+                    onChange={(e) =>
+                      onChange((s) => ({
+                        ...s,
+                        [id]: { ...s[id], isChefRecommended: e.target.checked },
+                      }))
+                    }
+                    className="hidden"
+                  />
+                  <span
+                    className={`text-xs font-bold uppercase ${
+                      state.isChefRecommended
+                        ? "text-brand-secondary"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    ⭐ Chef's Pick
+                  </span>
+                </label>
+              </div>
+
+              {/* Ingredients */}
+              <div className="space-y-3 pt-6 border-t border-gray-100">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Ingredients
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    className="flex-1 rounded-xl px-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-brand-primary/50 focus:ring-4 focus:ring-brand-primary/10 transition-all font-medium text-sm"
+                    placeholder="Add ingredient..."
+                    value={state._ingredientInput || ""}
+                    onChange={(e) =>
+                      onChange((s) => ({
+                        ...s,
+                        [id]: { ...s[id], _ingredientInput: e.target.value },
+                      }))
+                    }
+                    onKeyDown={onIngredientKeyDown}
+                  />
+                  <button
+                    type="button"
+                    onClick={onAddIngredient}
+                    className="bg-brand-dark text-white px-6 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-brand-primary transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(state.ingredients || []).map((ing, idx) => (
+                    <span
+                      key={idx}
+                      className="pl-3 pr-2 py-1.5 rounded-lg bg-gray-100 text-brand-dark text-xs font-bold flex items-center gap-2 group hover:bg-red-50 hover:text-red-500 transition-colors cursor-default"
+                    >
+                      {ing}
+                      <button
+                        type="button"
+                        onClick={() => onRemoveIngredient(idx)}
+                        className="opacity-20 group-hover:opacity-100"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 border-t border-white/5 px-6 py-4 bg-white/5">
+        <div className="flex items-center justify-end gap-3 px-8 py-6 border-t border-gray-100 bg-gray-50/50">
           <button
             onClick={onClose}
-            className="rounded-xl px-5 py-2.5 text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+            className="px-6 py-3 rounded-xl text-gray-400 font-bold text-xs uppercase tracking-wider hover:bg-gray-100 hover:text-gray-600 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onSave}
-            className="rounded-xl px-6 py-2.5 text-sm font-bold bg-neon-gold text-black hover:bg-neon-gold/90 shadow-lg shadow-neon-gold/10 transition-all"
+            className="px-8 py-3 rounded-xl bg-brand-primary text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-brand-primary/20 hover:bg-brand-primary/90 hover:scale-105 transition-all"
           >
             Save Changes
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -980,39 +1121,39 @@ function DeleteDialog({ name, loading, onCancel, onConfirm }) {
     >
       <div
         ref={boxRef}
-        className="w-full max-w-md overflow-hidden rounded-3xl bg-[#1a1c20] border border-white/10 shadow-2xl ring-1 ring-white/5"
+        className="w-full max-w-md overflow-hidden rounded-[2rem] bg-white border border-brand-dark/5 shadow-2xl relative"
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-white/5 px-6 py-4 bg-white/5">
-          <h3 className="text-lg font-bold text-red-400 font-cutive">
+        <div className="flex items-center justify-between border-b border-brand-dark/5 px-6 py-4 bg-red-50">
+          <h3 className="text-lg font-bold text-red-600 font-display uppercase tracking-tight">
             Delete Item
           </h3>
           <button
             onClick={onCancel}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-white text-brand-dark/40 hover:text-red-600 transition-colors shadow-sm"
             title="Close"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="px-6 py-6 text-sm text-white/80">
+        <div className="px-8 py-8 text-sm text-brand-dark/60 font-medium">
           Are you sure you want to delete{" "}
-          <span className="font-bold text-white">{name}</span>? This action
-          cannot be undone.
+          <span className="font-bold text-brand-primary">{name}</span>? This
+          action cannot be undone.
         </div>
 
-        <div className="flex items-center justify-end gap-3 border-t border-white/5 px-6 py-4 bg-white/5">
+        <div className="flex items-center justify-end gap-3 border-t border-brand-dark/5 px-6 py-4 bg-brand-cream/30">
           <button
             onClick={onCancel}
-            className="rounded-xl px-5 py-2.5 text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+            className="rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-brand-dark/40 hover:text-brand-dark hover:bg-white transition-all"
             disabled={loading}
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-xs font-bold uppercase tracking-widest bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all disabled:opacity-50 active:scale-95"
             disabled={loading}
           >
             {loading ? (

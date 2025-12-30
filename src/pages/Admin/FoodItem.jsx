@@ -1,6 +1,6 @@
 // src/pages/Admin/FoodItem.jsx
 import React, { useState, useMemo } from "react";
-import { createFoodItem } from "../../api/foodApi";
+import { createFoodItem } from "../../api/foodapi";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Upload, X, Check, Flame, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -29,6 +29,7 @@ const FoodItem = () => {
     ingredients: [],
     category: "main_course",
     spiceLevel: 0,
+    isChefRecommended: false,
   });
 
   const [ingredientInput, setIngredientInput] = useState("");
@@ -147,6 +148,7 @@ const FoodItem = () => {
         ingredients: [],
         category: "main_course",
         spiceLevel: 0,
+        isChefRecommended: false,
       });
       setIngredientInput("");
       setErrors({});
@@ -173,10 +175,10 @@ const FoodItem = () => {
             <Plus className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-brand-dark font-cutive">
+            <h1 className="text-2xl font-bold text-brand-dark font-display uppercase tracking-tight">
               Add Food Item
             </h1>
-            <p className="text-sm text-brand-dark/60">
+            <p className="text-sm text-brand-dark/40 font-medium">
               Create a new dish for Taste of Madurai menu
             </p>
           </div>
@@ -198,7 +200,7 @@ const FoodItem = () => {
           onSubmit={onSubmit}
           className="bg-white rounded-3xl p-8 space-y-6 shadow-sm border border-brand-dark/5"
         >
-          <h2 className="text-xl font-bold text-brand-dark font-cutive border-b border-brand-dark/5 pb-4">
+          <h2 className="text-xl font-bold text-brand-dark font-display uppercase tracking-tight border-b border-brand-dark/5 pb-4">
             Item Details
           </h2>
 
@@ -553,6 +555,47 @@ const FoodItem = () => {
             <p className="text-xs text-red-500 font-medium">{errors.vegan}</p>
           )}
 
+          {/* Chef's Recommended */}
+          <label
+            className={`inline-flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+              form.isChefRecommended
+                ? "bg-brand-secondary/10 border-brand-secondary/30 shadow-sm"
+                : "bg-white border-brand-dark/10 hover:border-brand-dark/20"
+            }`}
+          >
+            <div
+              className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                form.isChefRecommended
+                  ? "bg-brand-secondary border-brand-secondary"
+                  : "border-brand-dark/20 bg-white"
+              }`}
+            >
+              {form.isChefRecommended && (
+                <Check className="w-3.5 h-3.5 text-white" />
+              )}
+            </div>
+            <input
+              type="checkbox"
+              checked={form.isChefRecommended}
+              onChange={(e) => setField("isChefRecommended", e.target.checked)}
+              className="hidden"
+            />
+            <div className="flex-1">
+              <span
+                className={`text-sm font-bold block ${
+                  form.isChefRecommended
+                    ? "text-brand-secondary"
+                    : "text-brand-dark/60"
+                }`}
+              >
+                ⭐ Chef's Recommended
+              </span>
+              <span className="text-xs text-brand-dark/40">
+                Show in Chef's Signature section
+              </span>
+            </div>
+          </label>
+
           {/* Spice Level */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-brand-dark/60 uppercase tracking-wider">
@@ -635,6 +678,7 @@ const FoodItem = () => {
                   ingredients: [],
                   category: "main_course",
                   spiceLevel: 0,
+                  isChefRecommended: false,
                 });
                 setIngredientInput("");
                 setErrors({});
@@ -649,7 +693,7 @@ const FoodItem = () => {
 
         {/* Preview */}
         <div className="space-y-6">
-          <h2 className="text-xl font-bold text-brand-dark font-cutive px-2">
+          <h2 className="text-xl font-bold text-brand-dark font-display uppercase tracking-tight px-2">
             Live Preview
           </h2>
           <div className="bg-white rounded-3xl overflow-hidden shadow-2xl border border-brand-dark/5 sticky top-6">
@@ -702,7 +746,7 @@ const FoodItem = () => {
             {/* Content Area */}
             <div className="p-8">
               <div className="flex justify-between items-start gap-4 mb-3">
-                <h3 className="text-2xl font-bold text-brand-dark font-cutive leading-tight">
+                <h3 className="text-2xl font-bold text-brand-dark font-display uppercase tracking-tight leading-tight">
                   {form.name || "Item Name"}
                 </h3>
               </div>

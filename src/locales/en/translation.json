@@ -1,4 +1,6 @@
 {
+  "brand": "Taste of Madurai",
+  "tagline": "Authentic South Indian",
   "nav": {
     "home": "Home",
     "menu": "Menu",
@@ -6,7 +8,11 @@
     "contact": "Contact",
     "signin": "Sign In",
     "signout": "Sign Out",
-    "back_to_admin": "Back to Admin"
+    "back_to_admin": "Back to Admin",
+    "orderUs": "Order Online",
+    "openingHours": "Opening Hours",
+    "order_foodora": "Order via Foodora",
+    "menu_label": "Menu"
   },
   "hero": {
     "subtitle": "Authentic Indian Cuisine",
@@ -14,7 +20,14 @@
     "description": "Experience the soulful flavors of South India, crafted with passion and traditional spices in the heart of Sweden.",
     "cta_main": "View Full Menu",
     "cta_secondary": "Book a Table",
-    "scroll": "Scroll to Explore"
+    "scroll": "Scroll to Explore",
+    "stockholm_rated": "Top Rated in Stockholm",
+    "today_hours": "Today's Hours",
+    "rating_label": "Rating",
+    "reviews_label": "Google Reviews",
+    "authentic_label": "Authentic",
+    "spices_label": "Spices from India",
+    "discover": "Discover"
   },
   "features": {
     "authentic": {
@@ -43,9 +56,37 @@
       "title": "Our Menu",
       "subtitle": "Explore our wide range of authentic dishes",
       "filter_all": "All",
+      "veg": "Vegetarian",
+      "non_veg": "Non-Vegetarian",
       "search_placeholder": "Search for dishes...",
       "no_results": "No items found matching your search.",
+      "no_match_title": "No match found",
+      "no_match_desc": "Try adjusting your filters or search terms.",
+      "reset_filters": "Reset Filters",
+      "exp_details": "Experience Details",
       "price": "Price"
+    },
+    "item_detail": {
+      "loading_msg": "Preparing the Magic...",
+      "not_found_title": "Dish Not Found",
+      "not_found_desc": "The flavors you seek are currently wandering in the streets of Madurai.",
+      "go_back": "Go Back",
+      "try_again": "Try Again",
+      "chef_choice": "Chef's Choice",
+      "prep_time": "15-20 MIN",
+      "experience": "The Experience",
+      "experience_default": "A masterpiece of South Indian culinary tradition, prepared with hand-ground spices and the freshest ingredients.",
+      "ingredients": "Key Ingredients",
+      "similar_title": "You might also love",
+      "price_breakdown": "Price Breakdown",
+      "preparation": "Preparation",
+      "prep_fresh": "Freshly Cooked",
+      "spice_level": "Spice Level",
+      "availability": "Availability",
+      "in_kitchen": "In Kitchen",
+      "sold_out": "Sold Out",
+      "add_to_basket": "Add to Basket",
+      "checkout_foodora": "Secure Checkout via Foodora"
     },
     "feedback": {
       "trigger": "Feedback",
@@ -53,6 +94,7 @@
       "subtitle": "Help us improve Taste of Madurai. Share your experience with us!",
       "rate_label": "Rate Experience",
       "message_label": "Your Feedback",
+      "message_placeholder": "Tell us what you loved or how we can improve...",
       "email_label": "Email",
       "phone_label": "Phone",
       "optional": "(optional)",
@@ -62,6 +104,79 @@
       "success_title": "Thank You!",
       "success_msg": "We verify every message personally. Your feedback helps us grow.",
       "close": "Close"
+    },
+    "gallery": {
+      "badge": "Visual Feast",
+      "title": "Captured",
+      "title_accent": "Moments",
+      "follow_us": "Follow Us"
+    },
+    "testimonials": {
+      "badge": "Guest Love",
+      "title": "What our",
+      "title_accent": "Guests Say",
+      "subtitle": "Don't just take our word for it. Here's what our community loves about the Taste of Madurai experience.",
+      "items": [
+        {
+          "name": "Erik Svensson",
+          "role": "Local Foodie",
+          "content": "The most authentic South Indian food I've had in Stockholm. The dosas are crispy and the chutneys are incredibly fresh. A hidden gem!"
+        },
+        {
+          "name": "Priya Krishna",
+          "role": "Regular Customer",
+          "content": "Reminds me of home. The mutton biryani is exactly how it tastes in Madurai. The staff is so warm and welcoming."
+        },
+        {
+          "name": "Lars Jensen",
+          "role": "Chef",
+          "content": "Incredible depth of flavor in every dish. You can taste the quality of the hand-ground spices. Highly recommended for spice lovers."
+        }
+      ]
+    },
+    "special_offers": {
+      "badge": "Exclusive Deals",
+      "title": "Limited Time",
+      "title_accent": "Offers",
+      "items": {
+        "family": {
+          "title": "Family Feast Combo",
+          "desc": "2 Chicken Biryanis, 1 Chicken 65, and 2 Parottas. Perfect for a family dinner.",
+          "tag": "Best Value"
+        },
+        "student": {
+          "title": "Student Lunch Special",
+          "desc": "Any vegetarian curry with rice or parotta. Valid with student ID.",
+          "tag": "Weekdays Only"
+        },
+        "weekend": {
+          "title": "Weekend Biryani Bonanza",
+          "desc": "Unlimited refill on any Biryani order. Dine-in only.",
+          "tag": "Limited Time"
+        }
+      }
+    },
+    "location": {
+      "badge": "Visit Us",
+      "title": "Find Your Way to",
+      "title_accent": "Flavor",
+      "description": "Located in the heart of Stockholm, we bring the authentic streets of Madurai to your table. Come say hi!",
+      "address_label": "Address",
+      "hours_label": "Opening Hours",
+      "loading_hours": "Loading hours...",
+      "call_us": "Call Us",
+      "email_label": "Email"
+    },
+    "newsletter": {
+      "badge": "Join the Club",
+      "title_line1": "Get 10% Off Your",
+      "title_line2": "First Order",
+      "description": "Subscribe to our newsletter for exclusive deals, new menu updates, and a special welcome gift straight to your inbox.",
+      "placeholder": "Enter your email address",
+      "button": "Subscribe",
+      "joining": "Joining...",
+      "success_msg": "Welcome to the family! Check your inbox for your 10% discount code.",
+      "footer_msg": "No spam, just spice. Unsubscribe anytime."
     }
   },
   "footer": {
@@ -69,7 +184,12 @@
     "quick_links": "Quick Links",
     "contact": "Contact Us",
     "social": "Follow Us",
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "language": "Language",
+    "about": "About Us",
+    "careers": "Careers",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
   },
   "common": {
     "loading": "Loading...",
@@ -78,7 +198,8 @@
     "back_home": "Back to Home",
     "open": "Open",
     "closed": "Closed",
-    "sek": "SEK"
+    "sek": "SEK",
+    "loading_sections": "Loading sections..."
   },
   "content": {
     "promise": {
@@ -96,8 +217,12 @@
     },
     "founders": {
       "title": "From Our Family to Yours",
-      "description": "Born from a longing for the authentic tastes of home, Taste of Madurai was founded to bring the vibrant culinary heritage of Tamil Nadu to Stockholm. Every dish we serve carries the legacy of our ancestors.",
-      "established": "Established 2024"
+      "description": "Founded by a South Indian couple in the heart of Stockholm, Taste of Madurai was born from a longing for the authentic tastes of home. We are dedicated to bringing the vibrant culinary heritage of Tamil Nadu to Sweden, where every dish carries the legacy of our ancestors.",
+      "established": "Established 2024",
+      "temple_title": "Madurai Meenakshi",
+      "temple_desc": "The soul of our inspiration",
+      "auth_title": "Authentic Taste",
+      "auth_desc": "Hand-ground spices and traditional recipes passed down through generations."
     }
   }
 }

@@ -3,38 +3,29 @@ import { motion } from "framer-motion";
 import { Tag, Clock, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const offers = [
-  {
-    id: 1,
-    title: "Family Feast Combo",
-    description:
-      "2 Chicken Biryanis, 1 Chicken 65, and 2 Parottas. Perfect for a family dinner.",
-    price: "349 kr",
-    originalPrice: "420 kr",
-    tag: "Best Value",
-    color: "from-brand-primary to-brand-secondary",
-  },
-  {
-    id: 2,
-    title: "Student Lunch Special",
-    description:
-      "Any vegetarian curry with rice or parotta. Valid with student ID.",
-    price: "119 kr",
-    originalPrice: "145 kr",
-    tag: "Weekdays Only",
-    color: "from-brand-secondary to-orange-500",
-  },
-  {
-    id: 3,
-    title: "Weekend Biryani Bonanza",
-    description: "Unlimited refill on any Biryani order. Dine-in only.",
-    price: "199 kr",
-    tag: "Limited Time",
-    color: "from-brand-dark to-gray-800",
-  },
-];
+const offersArr = []; // Loaded via t()
+
+import { useTranslation } from "react-i18next";
 
 export default function SpecialOffers() {
+  const { t } = useTranslation();
+
+  /* DYNAMIC OFFERS LOGIC */
+  const [offersList, setOffersList] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    import("../../api/offerApi").then(({ getActiveOffers }) => {
+      getActiveOffers()
+        .then((data) => {
+          setOffersList(data);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    });
+  }, []);
+
+  if (!loading && offersList.length === 0) return null; // Hide section if no offers
   return (
     <section className="py-24 bg-brand-cream relative overflow-hidden">
       {/* Dynamic Background */}
@@ -55,7 +46,7 @@ export default function SpecialOffers() {
           >
             <Tag className="w-4 h-4 text-brand-primary" />
             <span className="text-xs font-bold text-brand-dark uppercase tracking-widest">
-              Exclusive Deals
+              {t("sections.special_offers.badge")}
             </span>
           </motion.div>
 
@@ -65,14 +56,17 @@ export default function SpecialOffers() {
             viewport={{ once: true }}
             className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-brand-dark uppercase tracking-tight"
           >
-            Limited Time <span className="text-gradient">Offers</span>
+            {t("sections.special_offers.title")}{" "}
+            <span className="text-gradient">
+              {t("sections.special_offers.title_accent")}
+            </span>
           </motion.h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {offers.map((offer, index) => (
+          {offersList.map((offer, index) => (
             <motion.div
-              key={offer.id}
+              key={index}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -108,7 +102,7 @@ export default function SpecialOffers() {
                 <div className="flex items-end justify-between mt-auto">
                   <div>
                     <span className="text-xs font-bold text-brand-dark/40 uppercase tracking-widest block mb-1">
-                      Price
+                      {t("sections.menu.price")}
                     </span>
                     <span className="text-3xl font-display font-bold text-brand-dark">
                       {offer.price}

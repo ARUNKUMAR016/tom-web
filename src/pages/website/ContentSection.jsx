@@ -48,10 +48,10 @@ export default function ContentSection() {
                 />
                 <div className="absolute bottom-0 left-0 p-4 sm:p-6 text-white">
                   <h3 className="font-display uppercase tracking-wide text-lg sm:text-xl font-bold">
-                    Madurai Meenakshi
+                    {t("content.founders.temple_title")}
                   </h3>
                   <p className="text-white/90 text-xs sm:text-sm font-sans">
-                    The soul of our inspiration
+                    {t("content.founders.temple_desc")}
                   </p>
                 </div>
               </div>
@@ -72,11 +72,10 @@ export default function ContentSection() {
               <div className="h-full rounded-2xl md:rounded-[2rem] bg-brand-dark p-4 sm:p-5 md:p-6 flex flex-col justify-center text-brand-cream shadow-xl">
                 <Utensils className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-brand-secondary mb-3 sm:mb-4" />
                 <h3 className="font-display uppercase tracking-wide text-base sm:text-lg font-bold mb-1 sm:mb-2 text-brand-secondary">
-                  Authentic Taste
+                  {t("content.founders.auth_title")}
                 </h3>
                 <p className="text-brand-cream/80 text-xs sm:text-sm leading-relaxed font-sans">
-                  Hand-ground spices and traditional recipes passed down through
-                  generations.
+                  {t("content.founders.auth_desc")}
                 </p>
               </div>
             </motion.div>

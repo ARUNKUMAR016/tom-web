@@ -4,9 +4,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        display: ["Oswald", "sans-serif"], // For bold headings (Tacos style)
-        cutive: ["Cutive Mono", "monospace", "sans-serif"],
+        sans: ["'Plus Jakarta Sans'", "sans-serif"],
+        display: ["'Outfit'", "sans-serif"], // Premium Geometric Sans
+        cutive: ["'Cutive Mono'", "monospace", "sans-serif"],
       },
       colors: {
         brand: {

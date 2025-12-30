@@ -1,4 +1,6 @@
 {
+  "brand": "Taste of Madurai",
+  "tagline": "Autentisk Sydindisk",
   "nav": {
     "home": "Hem",
     "menu": "Meny",
@@ -6,7 +8,11 @@
     "contact": "Kontakt",
     "signin": "Logga in",
     "signout": "Logga ut",
-    "back_to_admin": "Till Admin"
+    "back_to_admin": "Till Admin",
+    "orderUs": "Beställ Online",
+    "openingHours": "Öppettider",
+    "order_foodora": "Beställ via Foodora",
+    "menu_label": "Meny"
   },
   "hero": {
     "subtitle": "Autentisk Indisk Mat",
@@ -14,7 +20,14 @@
     "description": "Upplev själsfulla smaker från södra Indien, lagade med passion och traditionella kryddor i hjärtat av Sverige.",
     "cta_main": "Visa Meny",
     "cta_secondary": "Boka Bord",
-    "scroll": "Scrolla för mer"
+    "scroll": "Scrolla för mer",
+    "stockholm_rated": "Högst rankad i Stockholm",
+    "today_hours": "Dagens öppettider",
+    "rating_label": "Betyg",
+    "reviews_label": "Google-recensioner",
+    "authentic_label": "Autentisk",
+    "spices_label": "Kryddor från Indien",
+    "discover": "Upptäck"
   },
   "features": {
     "authentic": {
@@ -43,9 +56,37 @@
       "title": "Vår Meny",
       "subtitle": "Utforska vårt breda utbud av autentiska rätter",
       "filter_all": "Alla",
+      "veg": "Vegetariskt",
+      "non_veg": "Icke-Vegetariskt",
       "search_placeholder": "Sök efter rätter...",
       "no_results": "Inga rätter hittades.",
+      "no_match_title": "Ingen träff hittades",
+      "no_match_desc": "Prova att justera dina filter eller söktermer.",
+      "reset_filters": "Återställ filter",
+      "exp_details": "Upplev detaljer",
       "price": "Pris"
+    },
+    "item_detail": {
+      "loading_msg": "Förbereder magin...",
+      "not_found_title": "Rätten hittades inte",
+      "not_found_desc": "Smakerna du söker vandrar för närvarande på Madurais gator.",
+      "go_back": "Gå tillbaka",
+      "try_again": "Försök igen",
+      "chef_choice": "Kockens val",
+      "prep_time": "15-20 MIN",
+      "experience": "Upplevelsen",
+      "experience_default": "Ett mästerverk av sydindisk kulinarisk tradition, tillagat med handmalda kryddor och de färskaste ingredienserna.",
+      "ingredients": "Huvudingredienser",
+      "similar_title": "Du kanske också gillar",
+      "price_breakdown": "Prisöversikt",
+      "preparation": "Tillagning",
+      "prep_fresh": "Nylagat",
+      "spice_level": "Kryddnivå",
+      "availability": "Tillgänglighet",
+      "in_kitchen": "I köket",
+      "sold_out": "Slutsåld",
+      "add_to_basket": "Lägg i varukorg",
+      "checkout_foodora": "Säker utcheckning via Foodora"
     },
     "feedback": {
       "trigger": "Feedback",
@@ -53,6 +94,7 @@
       "subtitle": "Hjälp oss förbättra Taste of Madurai. Dela din upplevelse!",
       "rate_label": "Betygsätt Upplevelse",
       "message_label": "Din Feedback",
+      "message_placeholder": "Berätta vad du älskade eller hur vi kan förbättra oss...",
       "email_label": "E-post",
       "phone_label": "Telefon",
       "optional": "(frivilligt)",
@@ -62,6 +104,79 @@
       "success_title": "Tack!",
       "success_msg": "Vi läser varje meddelande personligen. Din feedback hjälper oss växa.",
       "close": "Stäng"
+    },
+    "gallery": {
+      "badge": "Visuell Fest",
+      "title": "Fångade",
+      "title_accent": "Ögonblick",
+      "follow_us": "Följ Oss"
+    },
+    "testimonials": {
+      "badge": "Gästkärlek",
+      "title": "Vad våra",
+      "title_accent": "Gäster Säger",
+      "subtitle": "Ta inte bara vårt ord för det. Här är vad vårt samhälle älskar med Taste of Madurai-upplevelsen.",
+      "items": [
+        {
+          "name": "Erik Svensson",
+          "role": "Lokal Matentusiast",
+          "content": "Den mest autentiska sydindiska maten jag har ätit i Stockholm. Deras dosas är frasiga och chutneyerna är otroligt fräscha. En gömd pärla!"
+        },
+        {
+          "name": "Priya Krishna",
+          "role": "Stammis",
+          "content": "Påminner mig om hemma. Mutton biryanin smakar exakt som den gör i Madurai. Personalen är så varm och välkomnande."
+        },
+        {
+          "name": "Lars Jensen",
+          "role": "Kock",
+          "content": "Otroligt djup i smakerna i varje rätt. Man kan känna kvaliteten på de handmalda kryddorna. Rekommenderas varmt för alla som älskar kryddstark mat."
+        }
+      ]
+    },
+    "special_offers": {
+      "badge": "Exklusiva Erbjudanden",
+      "title": "Begränsad Tid",
+      "title_accent": "Erbjudanden",
+      "items": {
+        "family": {
+          "title": "Familjepaket",
+          "desc": "2 Kyckling Biryani, 1 Kyckling 65 och 2 Parotta. Perfekt för en familjemiddag.",
+          "tag": "Bästa Värdet"
+        },
+        "student": {
+          "title": "Studentlunch-special",
+          "desc": "Valfri vegetarisk curry med ris eller parotta. Giltigt med student-ID.",
+          "tag": "Endast Vardagar"
+        },
+        "weekend": {
+          "title": "Weekend Biryani Bonanza",
+          "desc": "Obegränsad påfyllning på valfri Biryani. Gäller endast vid besök.",
+          "tag": "Begränsad Tid"
+        }
+      }
+    },
+    "location": {
+      "badge": "Besök Oss",
+      "title": "Hitta vägen till",
+      "title_accent": "Smaken",
+      "description": "Beläget i hjärtat av Stockholm, vi tar Madurais autentiska gator till ditt bord. Kom och säg hej!",
+      "address_label": "Adress",
+      "hours_label": "Öppettider",
+      "loading_hours": "Laddar tider...",
+      "call_us": "Ring Oss",
+      "email_label": "E-post"
+    },
+    "newsletter": {
+      "badge": "Gå med i klubben",
+      "title_line1": "Få 10% rabatt på din",
+      "title_line2": "första beställning",
+      "description": "Prenumerera på vårt nyhetsbrev för exklusiva erbjudanden, nya menyuppdateringar och en speciell välkomstpresent direkt i din inkorg.",
+      "placeholder": "Ange din e-postadress",
+      "button": "Prenumerera",
+      "joining": "Går med...",
+      "success_msg": "Välkommen till familjen! Kolla din inkorg för din 10% rabattkod.",
+      "footer_msg": "Ingen spam, bara kryddor. Avsluta prenumerationen när som helst."
     }
   },
   "footer": {
@@ -69,7 +184,12 @@
     "quick_links": "Snabblänkar",
     "contact": "Kontakta Oss",
     "social": "Följ Oss",
-    "rights": "Alla rättigheter förbehållna."
+    "rights": "Alla rättigheter förbehållna.",
+    "language": "Språk",
+    "about": "Om oss",
+    "careers": "Karriär",
+    "privacy": "Integritetspolicy",
+    "terms": "Användarvillkor"
   },
   "common": {
     "loading": "Laddar...",
@@ -78,7 +198,8 @@
     "back_home": "Tillbaka till Hem",
     "open": "Öppet",
     "closed": "Stängt",
-    "sek": "kr"
+    "sek": "kr",
+    "loading_sections": "Laddar sektioner..."
   },
   "content": {
     "promise": {
@@ -96,8 +217,12 @@
     },
     "founders": {
       "title": "Från Vår Familj till Er",
-      "description": "Född ur en längtan efter de autentiska smakerna hemifrån, grundades Taste of Madurai för att ta med det livfulla kulinariska arvet från Tamil Nadu till Stockholm. Varje rätt vi serverar bär arvet från våra förfäder.",
-      "established": "Etablerad 2024"
+      "description": "Taste of Madurai grundades av ett sydindiskt par i hjärtat av Stockholm och föddes ur en längtan efter de autentiska smakerna hemifrån. Vi är dedikerade till att föra Tamil Nadus livfulla kulinariska arv till Sverige, där varje rätt bär arvet från våra förfäder.",
+      "established": "Etablerad 2024",
+      "temple_title": "Madurai Meenakshi",
+      "temple_desc": "Själen i vår inspiration",
+      "auth_title": "Äkta Smak",
+      "auth_desc": "Handmalda kryddor och traditionella recept som gått i arv i generationer."
     }
   }
 }

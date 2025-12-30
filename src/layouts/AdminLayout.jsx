@@ -6,6 +6,9 @@ import {
   UtensilsCrossed,
   Settings,
   Menu,
+  ImageIcon,
+  MessageSquare,
+  Tag,
 } from "lucide-react";
 
 export default function AdminLayout() {
@@ -30,6 +33,9 @@ export default function AdminLayout() {
   const navItems = [
     { path: "/admin/home", label: "Dashboard", icon: LayoutDashboard },
     { path: "/admin/items", label: "Menu Items", icon: UtensilsCrossed },
+    { path: "/admin/offers", label: "Offers", icon: Tag },
+    { path: "/admin/moments", label: "Gallery", icon: ImageIcon },
+    { path: "/admin/reviews", label: "Reviews", icon: MessageSquare },
     { path: "/admin/settings", label: "Settings", icon: Settings },
   ];
 

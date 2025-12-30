@@ -191,7 +191,7 @@ export default function Header() {
               {/* Top bar */}
               <div className="flex items-center justify-between px-6 py-5 border-b border-brand-dark/5">
                 <span className="font-display text-xl font-bold text-brand-dark uppercase">
-                  Menu
+                  {t("nav.menu_label")}
                 </span>
                 <Button
                   variant="ghost"
@@ -217,8 +217,8 @@ export default function Header() {
                   <MobileItem to="/menu" onClick={close}>
                     {t("nav.menu")}
                   </MobileItem>
-                  <MobileItem to="/kki" onClick={close}>
-                    Order Online
+                  <MobileItem to="/menu" onClick={close}>
+                    {t("nav.orderUs")}
                   </MobileItem>
                   <MobileItem to="/contact" onClick={close}>
                     {t("nav.contact")}
@@ -249,7 +249,7 @@ export default function Header() {
               {/* Footer info */}
               <div className="p-6 bg-brand-dark text-brand-cream">
                 <p className="text-brand-secondary text-xs font-bold uppercase tracking-wider mb-1">
-                  Opening Hours
+                  {t("nav.openingHours")}
                 </p>
                 <p className="font-sans text-lg">Sat & Sun · 10:00 – 19:00</p>
               </div>

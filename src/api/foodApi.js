@@ -1,8 +1,8 @@
 // src/api/foodApi.js
-const BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+export const BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 /* ------------------------------ fetch helpers ------------------------------ */
-async function jsonFetch(url, options = {}) {
+export async function jsonFetch(url, options = {}) {
   const res = await fetch(url, {
     headers: { "Content-Type": "application/json", ...(options.headers || {}) },
     ...options,
@@ -10,7 +10,8 @@ async function jsonFetch(url, options = {}) {
   const isJson = res.headers.get("content-type")?.includes("application/json");
   const data = isJson ? await res.json() : null;
   if (!res.ok) {
-    const msg = data?.message || data?.error || `Request failed (${res.status})`;
+    const msg =
+      data?.message || data?.error || `Request failed (${res.status})`;
     throw new Error(msg);
   }
   return data;
@@ -24,7 +25,8 @@ async function formFetch(url, formData, options = {}) {
   const isJson = res.headers.get("content-type")?.includes("application/json");
   const data = isJson ? await res.json() : null;
   if (!res.ok) {
-    const msg = data?.message || data?.error || `Request failed (${res.status})`;
+    const msg =
+      data?.message || data?.error || `Request failed (${res.status})`;
     throw new Error(msg);
   }
   return data;
@@ -76,8 +78,9 @@ export function createFoodItem(payload) {
   appendIfDefined(fd, "ingredients", payload.ingredients || []);
 
   // NEW fields
-  appendIfDefined(fd, "category", payload.category);      // main_course/appetizer/drink/combo
-  appendIfDefined(fd, "spiceLevel", payload.spiceLevel);  // 0..5
+  appendIfDefined(fd, "category", payload.category); // main_course/appetizer/drink/combo
+  appendIfDefined(fd, "spiceLevel", payload.spiceLevel); // 0..5
+  appendIfDefined(fd, "isChefRecommended", !!payload.isChefRecommended);
 
   return formFetch(`${BASE}/api/food-items`, fd, { method: "POST" });
 }
@@ -114,7 +117,8 @@ export function updateFoodItem(id, payload) {
     for (const [k, v] of Object.entries(payload)) {
       if (k === "image") continue;
       if (v === undefined) continue;
-      if (k === "ingredients") fd.append("ingredients", JSON.stringify(v || []));
+      if (k === "ingredients")
+        fd.append("ingredients", JSON.stringify(v || []));
       else if (typeof v === "boolean") fd.append(k, String(v));
       else fd.append(k, String(v));
     }

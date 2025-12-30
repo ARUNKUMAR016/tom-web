@@ -3,11 +3,24 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 /**
  * Resolves a potentially relative image URL to a full absolute URL,
  * preventing duplicate slashes and forcing WebP extension for local uploads.
- * @param {string} url - The image URL from the DB (e.g., "/uploads/123.jpg" or "https://...")
- * @returns {string} - The fully resolved URL (e.g., "http://localhost:5000/uploads/123.webp")
+ * Also supports dynamic resizing for Cloudinary URLs.
+ * @param {string} url - The image URL from the DB
+ * @param {number} [width] - Optional width for resizing
+ * @returns {string} - The fully resolved and optionally transformed URL
  */
-export function resolveImage(url) {
+export function resolveImage(url, width) {
   if (!url) return "";
+
+  // Cloudinary Dynamic Resizing
+  if (url.includes("res.cloudinary.com") && width) {
+    // Inject transformation: w_width,c_limit,q_auto,f_auto
+    // Cloudinary URLs typical format: https://res.cloudinary.com/<cloud_name>/image/upload/v12345678/path/to/image.jpg
+    // We want to insert transformations after '/upload/'
+    const parts = url.split("/upload/");
+    if (parts.length === 2) {
+      return `${parts[0]}/upload/w_${width},c_limit,q_auto,f_auto/${parts[1]}`;
+    }
+  }
 
   // If it's already a full URL (firebase, s3, etc.), return as is
   // But if it points to our own server but was stored as full URL, we might still want to optimize?

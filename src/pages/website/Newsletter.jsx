@@ -4,7 +4,10 @@ import { Send, Mail, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
+import { useTranslation } from "react-i18next";
+
 export default function Newsletter() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -17,9 +20,7 @@ export default function Newsletter() {
     setTimeout(() => {
       setLoading(false);
       setEmail("");
-      toast.success(
-        "Welcome to the family! Check your inbox for your 10% discount code."
-      );
+      toast.success(t("sections.newsletter.success_msg"));
     }, 1500);
   };
 
@@ -43,7 +44,7 @@ export default function Newsletter() {
             >
               <Bell className="w-4 h-4 text-white" />
               <span className="text-xs font-bold uppercase tracking-widest">
-                Join the Club
+                {t("sections.newsletter.badge")}
               </span>
             </motion.div>
 
@@ -54,7 +55,8 @@ export default function Newsletter() {
               transition={{ delay: 0.1 }}
               className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold uppercase tracking-tight"
             >
-              Get 10% Off Your <br /> First Order
+              {t("sections.newsletter.title_line1")} <br />{" "}
+              {t("sections.newsletter.title_line2")}
             </motion.h2>
 
             <motion.p
@@ -64,8 +66,7 @@ export default function Newsletter() {
               transition={{ delay: 0.2 }}
               className="text-lg sm:text-xl text-white/80 font-sans leading-relaxed"
             >
-              Subscribe to our newsletter for exclusive deals, new menu updates,
-              and a special welcome gift straight to your inbox.
+              {t("sections.newsletter.description")}
             </motion.p>
 
             <motion.form
@@ -80,7 +81,7 @@ export default function Newsletter() {
                 <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-dark/40" />
                 <input
                   type="email"
-                  placeholder="Enter your email address"
+                  placeholder={t("sections.newsletter.placeholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -92,12 +93,14 @@ export default function Newsletter() {
                 disabled={loading}
                 className="h-16 px-10 rounded-full bg-brand-secondary text-brand-dark font-bold uppercase tracking-widest hover:bg-white hover:text-brand-primary transition-all shadow-lg hover:scale-105"
               >
-                {loading ? "Joining..." : "Subscribe"}
+                {loading
+                  ? t("sections.newsletter.joining")
+                  : t("sections.newsletter.button")}
               </Button>
             </motion.form>
 
             <p className="text-xs text-white/40 uppercase tracking-widest mt-6">
-              No spam, just spice. Unsubscribe anytime.
+              {t("sections.newsletter.footer_msg")}
             </p>
           </div>
         </div>

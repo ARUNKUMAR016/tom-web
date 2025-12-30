@@ -1,6 +1,7 @@
 // src/pages/Home.jsx
 import React, { Suspense, lazy } from "react";
 import HeroSection from "./HeroSection";
+import { useTranslation } from "react-i18next";
 
 const ContentSection = lazy(() => import("./ContentSection"));
 const ChefsRecommended = lazy(() => import("./ChefsRecommended3D"));
@@ -12,6 +13,7 @@ const LocationHours = lazy(() => import("./LocationHours"));
 const Newsletter = lazy(() => import("./Newsletter"));
 
 export default function Home() {
+  const { t } = useTranslation();
   return (
     <>
       <HeroSection />
@@ -20,7 +22,7 @@ export default function Home() {
       <Suspense
         fallback={
           <div className="h-40 flex items-center justify-center text-[#728175] font-cutive">
-            Loading sections...
+            {t("common.loading_sections")}
           </div>
         }
       >

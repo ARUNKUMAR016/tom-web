@@ -1,0 +1,19 @@
+{
+  "name": "Taste of Madurai - Authentic South Indian Cuisine",
+  "short_name": "ToM",
+  "description": "Experience the authentic flavors of South India in Stockholm",
+  "theme_color": "#B91C1C",
+  "background_color": "#FEF3E2",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

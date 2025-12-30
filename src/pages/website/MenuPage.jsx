@@ -11,10 +11,12 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { listFoodItems } from "../../api/foodApi";
+import { listFoodItems } from "../../api/foodapi";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { resolveImage } from "@/lib/imageUtils";
+import { MenuCardSkeleton } from "@/components/LoadingSkeletons";
+import ImageLoader from "@/components/ImageLoader";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const currency = (n) =>
@@ -111,13 +113,16 @@ export default function MenuPage() {
         </div>
 
         {/* Filters & Search - Premium Glass Bar */}
-        <div className="sticky top-24 z-40 mb-12 flex flex-col lg:flex-row items-center gap-6 p-4 sm:p-6 premium-glass rounded-[2rem] shadow-xl border border-white/50">
-          <div className="flex flex-wrap justify-center gap-3 w-full lg:w-auto">
+        <div className="sticky top-24 z-40 mb-12 flex flex-col lg:flex-row items-center gap-4 sm:gap-6 p-3 sm:p-6 premium-glass rounded-[2rem] shadow-xl border border-white/50">
+          <div
+            className="flex flex-nowrap sm:flex-wrap items-center justify-start sm:justify-center gap-3 w-full lg:w-auto overflow-x-auto pb-2 sm:pb-0 scrollbar-none snap-x"
+            style={{ scrollbarWidth: "none" }}
+          >
             {["all", "veg", "non-veg"].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+                className={`snap-start flex-shrink-0 px-6 sm:px-8 py-3 sm:py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
                   activeCategory === cat
                     ? "bg-brand-dark text-white shadow-lg scale-105"
                     : "bg-white/50 text-brand-dark hover:bg-brand-dark/5"
@@ -126,8 +131,8 @@ export default function MenuPage() {
                 {cat === "all"
                   ? t("sections.menu.filter_all")
                   : cat === "veg"
-                  ? "Vegetarian"
-                  : "Non-Vegetarian"}
+                  ? t("sections.menu.veg")
+                  : t("sections.menu.non_veg")}
               </button>
             ))}
           </div>
@@ -148,10 +153,7 @@ export default function MenuPage() {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="animate-pulse rounded-[2.5rem] bg-brand-dark/5 h-[400px]"
-              />
+              <MenuCardSkeleton key={i} />
             ))}
           </div>
         ) : (
@@ -179,10 +181,10 @@ export default function MenuPage() {
               <Utensils className="w-10 h-10 text-brand-dark/20" />
             </div>
             <h3 className="text-2xl font-display font-bold text-brand-dark uppercase">
-              No match found
+              {t("sections.menu.no_match_title")}
             </h3>
             <p className="text-brand-dark/60 mb-8">
-              Try adjusting your filters or search terms.
+              {t("sections.menu.no_match_desc")}
             </p>
             <Button
               variant="outline"
@@ -192,7 +194,7 @@ export default function MenuPage() {
               }}
               className="rounded-full px-8 py-6 uppercase font-bold tracking-widest border-2 border-brand-dark"
             >
-              Reset Filters
+              {t("sections.menu.reset_filters")}
             </Button>
           </motion.div>
         )}
@@ -213,81 +215,96 @@ export default function MenuPage() {
   );
 }
 
-function MenuTile({ item }) {
-  const [imgOk, setImgOk] = useState(true);
+// 3D Tilt Card Component
+const MenuTile = React.memo(function MenuTile({ item }) {
+  const { t } = useTranslation();
   const isVeg = item.type?.toLowerCase() === "veg";
+
+  // CSS for 3D effect
+  const cardStyle = {
+    transformStyle: "preserve-3d",
+  };
 
   return (
     <motion.div
       layout
       variants={itemVariants}
+      initial="hidden"
+      animate="visible"
       exit={{ opacity: 0, scale: 0.8 }}
-      className="group relative bg-white rounded-[2.5rem] overflow-hidden premium-shadow-hover border border-brand-dark/5"
+      className="group relative perspective-1000"
     >
       <Link to={`/menu/${item._id}`} className="block h-full">
-        <div className="aspect-[1/1] relative overflow-hidden">
-          {imgOk ? (
-            <img
-              src={resolveImage(item.imageUrl)}
-              alt={item.name}
-              loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-              onError={() => setImgOk(false)}
-            />
-          ) : (
-            <div className="h-full w-full grid place-items-center bg-brand-cream">
-              <ImageOff className="h-10 w-10 text-brand-dark/10" />
-            </div>
-          )}
+        <div
+          className="relative h-full bg-white rounded-[2.5rem] p-4 transition-all duration-500 ease-out transform group-hover:rotate-x-2 group-hover:rotate-y-2 group-hover:scale-[1.02] shadow-xl group-hover:shadow-2xl border border-brand-dark/5"
+          style={cardStyle}
+        >
+          {/* Image Container with Parallax feel */}
+          <div className="relative aspect-[4/3] rounded-[2rem] overflow-hidden bg-brand-cream/50 mb-6 translate-z-20">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10 opacity-60" />
 
-          {/* Badge Overlay */}
-          <div className="absolute top-6 left-6 flex flex-col gap-2">
-            <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg backdrop-blur-md border border-white/40 ${
-                isVeg ? "bg-emerald-500/90" : "bg-brand-primary/90"
-              }`}
-            >
-              {isVeg ? (
-                <Leaf className="w-5 h-5 text-white" />
-              ) : (
-                <div className="w-2.5 h-2.5 bg-white rounded-full" />
+            <ImageLoader
+              src={resolveImage(item.imageUrl, 600)}
+              alt={item.name}
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+            />
+
+            {/* Floating Price Tag */}
+            <div className="absolute bottom-4 right-4 z-20">
+              <div className="bg-white/90 backdrop-blur-md px-5 py-2.5 rounded-full shadow-lg border border-white/50 flex items-center gap-2 transform transition-transform group-hover:scale-110 duration-300">
+                <span className="font-display font-bold text-lg text-brand-dark">
+                  {currency(item.rate)}
+                </span>
+              </div>
+            </div>
+
+            {/* Badges */}
+            <div className="absolute top-4 left-4 z-20 flex gap-2">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg backdrop-blur-md border border-white/20 ${
+                  isVeg
+                    ? "bg-emerald-500 text-white"
+                    : "bg-brand-primary text-white"
+                }`}
+              >
+                {isVeg ? (
+                  <Leaf size={16} />
+                ) : (
+                  <div className="w-2 h-2 bg-current rounded-full" />
+                )}
+              </div>
+              {item.isChefRecommended && (
+                <div className="w-10 h-10 rounded-full bg-brand-secondary text-white flex items-center justify-center shadow-lg animate-pulse">
+                  <Star size={16} fill="currentColor" />
+                </div>
               )}
             </div>
-            {item.isChefRecommended && (
-              <div className="w-10 h-10 rounded-full bg-brand-secondary/90 flex items-center justify-center shadow-lg backdrop-blur-md border border-white/40 animate-bounce">
-                <Star className="w-5 h-5 text-white fill-white" />
-              </div>
-            )}
           </div>
 
-          <div className="absolute bottom-6 right-6">
-            <div className="premium-glass px-4 py-2 rounded-2xl shadow-lg border border-white/40">
-              <span className="font-display font-bold text-brand-dark text-lg">
-                {currency(item.rate)}
-              </span>
+          {/* Content */}
+          <div className="px-2 pb-4 translate-z-10">
+            <div className="flex justify-between items-start gap-4 mb-3">
+              <h3 className="font-display text-2xl font-bold text-brand-dark leading-tight group-hover:text-brand-primary transition-colors">
+                {item.name}
+              </h3>
             </div>
-          </div>
-        </div>
 
-        <div className="p-8">
-          <h3 className="font-display text-2xl font-bold text-brand-dark group-hover:text-brand-primary transition-colors uppercase tracking-tight mb-2">
-            {item.name}
-          </h3>
+            <p className="text-brand-dark/60 font-sans text-sm leading-relaxed line-clamp-2 mb-6 h-10">
+              {item.description}
+            </p>
 
-          <p className="text-sm text-brand-dark/60 font-sans line-clamp-2 mb-6 h-10">
-            {item.description}
-          </p>
-
-          <div className="flex items-center justify-between pt-6 border-t border-brand-dark/5">
-            <span className="text-[10px] font-bold text-brand-dark/40 uppercase tracking-[0.2em] group-hover:text-brand-primary transition-colors">
-              Experience Details
-            </span>
-            <div className="w-10 h-10 rounded-full bg-brand-cream flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-all duration-300">
-              <ArrowRight className="w-5 h-5" />
+            {/* "Add" Interaction */}
+            <div className="flex items-center justify-between pt-4 border-t border-brand-dark/5">
+              <span className="text-[10px] font-bold text-brand-dark/30 uppercase tracking-[0.2em] group-hover:tracking-[0.25em] transition-all">
+                {t("sections.menu.exp_details")}
+              </span>
+              <div className="w-12 h-12 rounded-full border border-brand-dark/10 flex items-center justify-center text-brand-dark group-hover:bg-brand-dark group-hover:text-white group-hover:border-brand-dark transition-all duration-300 shadow-sm group-hover:shadow-lg transform group-hover:rotate-[-45deg]">
+                <ArrowRight size={20} />
+              </div>
             </div>
           </div>
         </div>
       </Link>
     </motion.div>
   );
-}
+});

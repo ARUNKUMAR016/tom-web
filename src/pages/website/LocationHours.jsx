@@ -3,8 +3,10 @@ import { motion } from "framer-motion";
 import { MapPin, Clock, Phone, Mail, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getSettings } from "../../api/settingsApi";
+import { useTranslation } from "react-i18next";
 
 export default function LocationHours() {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState(null);
 
   useEffect(() => {
@@ -26,18 +28,19 @@ export default function LocationHours() {
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-primary/10 border border-brand-primary/20 mb-6">
                 <Navigation className="w-4 h-4 text-brand-primary" />
                 <span className="text-xs font-bold text-brand-primary uppercase tracking-widest">
-                  Visit Us
+                  {t("sections.location.badge")}
                 </span>
               </div>
 
               <h2 className="text-4xl sm:text-5xl font-display font-bold text-brand-dark uppercase tracking-tight mb-6">
-                Find Your Way to <br />
-                <span className="text-gradient">Flavor</span>
+                {t("sections.location.title")} <br />
+                <span className="text-gradient">
+                  {t("sections.location.title_accent")}
+                </span>
               </h2>
 
               <p className="text-brand-dark/70 font-sans text-lg leading-relaxed max-w-md">
-                Located in the heart of Stockholm, we bring the authentic
-                streets of Madurai to your table. Come say hi!
+                {t("sections.location.description")}
               </p>
             </div>
 
@@ -48,11 +51,11 @@ export default function LocationHours() {
                 </div>
                 <div>
                   <h4 className="font-display font-bold text-brand-dark uppercase tracking-wide mb-1">
-                    Address
+                    {t("sections.location.address_label")}
                   </h4>
                   <p className="text-brand-dark/70">
-                    Drottninggatan 12, <br />
-                    111 51 Stockholm, Sweden
+                    Madängsvägen 7, <br />
+                    129 49 Hägersten, Stockholm, Sweden
                   </p>
                 </div>
               </div>
@@ -63,7 +66,7 @@ export default function LocationHours() {
                 </div>
                 <div className="w-full">
                   <h4 className="font-display font-bold text-brand-dark uppercase tracking-wide mb-2">
-                    Opening Hours
+                    {t("sections.location.hours_label")}
                   </h4>
                   <div className="space-y-2 text-sm">
                     {settings?.openingHours ? (
@@ -81,7 +84,9 @@ export default function LocationHours() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-brand-dark/70">Loading hours...</p>
+                      <p className="text-brand-dark/70">
+                        {t("sections.location.loading_hours")}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -90,14 +95,14 @@ export default function LocationHours() {
               <div className="flex gap-4">
                 <Button className="flex-1 h-14 rounded-full bg-brand-dark hover:bg-brand-primary text-white font-bold uppercase tracking-widest shadow-lg">
                   <Phone className="w-4 h-4 mr-2" />
-                  Call Us
+                  {t("sections.location.call_us")}
                 </Button>
                 <Button
                   variant="outline"
                   className="flex-1 h-14 rounded-full border-2 border-brand-dark/10 hover:bg-brand-dark/5 text-brand-dark font-bold uppercase tracking-widest"
                 >
                   <Mail className="w-4 h-4 mr-2" />
-                  Email
+                  {t("sections.location.email_label")}
                 </Button>
               </div>
             </div>
@@ -111,7 +116,7 @@ export default function LocationHours() {
             className="relative h-[600px] rounded-[3rem] overflow-hidden shadow-2xl border border-brand-dark/10"
           >
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2035.1567175960098!2d18.06121231607593!3d59.33230998165997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x465f9d5e3532c10d%3A0xe54cda2401659937!2sDrottninggatan%2012%2C%20111%2051%20Stockholm%2C%20Sweden!5e0!3m2!1sen!2sin!4v1652882912345!5m2!1sen!2sin"
+              src="https://maps.google.com/maps?q=Mad%C3%A4ngsv%C3%A4gen+7,+129+49+H%C3%A4gersten&t=&z=15&ie=UTF8&iwloc=&output=embed"
               width="100%"
               height="100%"
               style={{ border: 0 }}

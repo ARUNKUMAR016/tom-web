@@ -53,7 +53,7 @@ export default function Footer() {
         } else if (closed.length === 0) {
           setDaysLabel("Mon - Sun");
         } else {
-          setDaysLabel("Open Days");
+          setDaysLabel(t("nav.openingHours"));
         }
       })
       .catch(() => {});
@@ -91,7 +91,7 @@ export default function Footer() {
                   Taste of Madurai
                 </h1>
                 <p className="text-[10px] text-brand-secondary tracking-[0.2em] uppercase font-bold">
-                  Authentic South Indian
+                  {t("tagline")}
                 </p>
               </div>
             </div>
@@ -121,8 +121,8 @@ export default function Footer() {
               <FooterLink to="/">{t("nav.home")}</FooterLink>
               <FooterLink to="/menu">{t("nav.menu")}</FooterLink>
               <FooterLink to="/kki">{t("nav.orderUs")}</FooterLink>
-              <FooterLink to="/about">About Us</FooterLink>
-              <FooterLink to="/careers">Careers</FooterLink>
+              <FooterLink to="/about">{t("footer.about")}</FooterLink>
+              <FooterLink to="/careers">{t("footer.careers")}</FooterLink>
             </ul>
           </div>
 
@@ -209,13 +209,13 @@ export default function Footer() {
               to="/privacy"
               className="hover:text-brand-secondary transition-colors"
             >
-              Privacy Policy
+              {t("footer.privacy")}
             </Link>
             <Link
               to="/terms"
               className="hover:text-brand-secondary transition-colors"
             >
-              Terms of Service
+              {t("footer.terms")}
             </Link>
           </div>
         </div>

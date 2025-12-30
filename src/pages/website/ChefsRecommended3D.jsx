@@ -6,11 +6,13 @@ import {
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
-import { listFoodItems } from "../../api/foodApi";
+import { listFoodItems } from "../../api/foodapi";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { resolveImage } from "@/lib/imageUtils";
+import { ChefPickSkeleton } from "@/components/LoadingSkeletons";
+import ImageLoader from "@/components/ImageLoader";
 
 export default function ChefsRecommended3D() {
   const { t } = useTranslation();
@@ -21,11 +23,9 @@ export default function ChefsRecommended3D() {
   const load = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await listFoodItems();
-      const chef = data.filter((x) => x.chefRecommended || x.isChefRecommended);
-      // Ensure we have enough items for a nice slider
-      const useItems = chef.length ? chef : data.slice(0, 8);
-      setItems(useItems);
+      // Fetch only chef recommended items
+      const data = await listFoodItems({ chefRecommended: true });
+      setItems(data);
     } catch (e) {
       console.error(e);
       setItems([]);
@@ -86,7 +86,7 @@ export default function ChefsRecommended3D() {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="flex items-center gap-4"
+            className="flex items-center gap-4 hidden md:flex"
           >
             <button
               onClick={() => scroll("left")}
@@ -106,16 +106,11 @@ export default function ChefsRecommended3D() {
         {/* Cinematic Slider */}
         <div
           ref={scrollRef}
-          className="flex gap-6 overflow-x-auto pb-12 scrollbar-none snap-x snap-mandatory"
+          className="flex gap-4 sm:gap-6 overflow-x-auto pb-12 scrollbar-none snap-x snap-mandatory px-4 md:px-0"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {loading
-            ? [...Array(4)].map((_, i) => (
-                <div
-                  key={i}
-                  className="min-w-[300px] md:min-w-[400px] h-[500px] rounded-[2rem] bg-white/5 animate-pulse"
-                />
-              ))
+            ? [...Array(4)].map((_, i) => <ChefPickSkeleton key={i} />)
             : items.map((item, index) => (
                 <motion.div
                   key={item._id}
@@ -127,14 +122,16 @@ export default function ChefsRecommended3D() {
                 >
                   <Link
                     to={`/menu/${item._id}`}
-                    className="group block relative w-[320px] md:w-[420px] h-[560px] rounded-[2.5rem] overflow-hidden bg-gradient-to-b from-white/10 to-transparent border border-white/5 hover:border-brand-primary/30 transition-all duration-500"
+                    className="group block relative w-[85vw] sm:w-[420px] h-[500px] sm:h-[560px] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden bg-gradient-to-b from-white/10 to-transparent border border-white/5 hover:border-brand-primary/30 transition-all duration-500"
                   >
                     {/* Image Layer */}
                     <div className="absolute inset-0 z-0">
-                      <img
-                        src={resolveImage(item.imageUrl)}
+                      <ImageLoader
+                        src={resolveImage(item.imageUrl, 800)}
                         alt={item.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
+                        placeholderClassName="bg-white/5"
+                        errorClassName="bg-white/5"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90" />
                     </div>

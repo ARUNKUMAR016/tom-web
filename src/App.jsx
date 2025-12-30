@@ -1,6 +1,7 @@
 // src/App.jsx
 import React, { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Loader from "@/components/Loader"; // add a small spinner or skeleton here
 
 // ✅ Lazy-load all pages to reduce initial bundle size
@@ -16,6 +17,9 @@ const AdminHome = lazy(() => import("./pages/Admin/AdminHome"));
 const AllItems = lazy(() => import("./pages/Admin/AllItems"));
 const FoodItem = lazy(() => import("./pages/Admin/FoodItem"));
 const Settings = lazy(() => import("./pages/Admin/Settings"));
+const Moments = lazy(() => import("./pages/Admin/Moments"));
+const Reviews = lazy(() => import("./pages/Admin/Reviews"));
+const Offers = lazy(() => import("./pages/Admin/Offers")); // Fixed case
 
 /* ---------------- Private Route Wrapper ---------------- */
 function PrivateRoute({ children }) {
@@ -52,6 +56,9 @@ export default function App() {
           <Route path="items" element={<AllItems />} />
           <Route path="items/new" element={<FoodItem />} />
           <Route path="items/:id" element={<ItemDetail />} />
+          <Route path="offers" element={<Offers />} />
+          <Route path="moments" element={<Moments />} />
+          <Route path="reviews" element={<Reviews />} />
           <Route path="settings" element={<Settings />} />
         </Route>
 
@@ -67,7 +74,9 @@ function FullPageFallback() {
   return (
     <div className="flex items-center justify-center h-screen bg-[#F8F4EC]">
       <Loader />
-      <p className="ml-2 font-cutive text-[#728175]">Loading...</p>
+      <p className="ml-2 font-cutive text-[#728175]">
+        {useTranslation().t("common.loading")}
+      </p>
     </div>
   );
 }

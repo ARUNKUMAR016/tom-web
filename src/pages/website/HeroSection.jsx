@@ -20,7 +20,7 @@ export default function HeroSection() {
       const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
       const hours = data.openingHours?.find((h) => h.day === today);
       setOpeningHours(
-        hours ? `${hours.open} - ${hours.close}` : "Closed today"
+        hours ? `${hours.open} - ${hours.close}` : t("common.closed")
       );
     });
   }, []);
@@ -52,7 +52,7 @@ export default function HeroSection() {
             >
               <Star className="w-4 h-4 text-brand-primary fill-brand-primary" />
               <span className="text-xs font-bold text-brand-primary uppercase tracking-widest">
-                Top Rated in Stockholm
+                {t("hero.stockholm_rated")}
               </span>
             </motion.div>
 
@@ -98,7 +98,7 @@ export default function HeroSection() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase font-bold text-brand-dark/40 tracking-widest">
-                    Today's Hours
+                    {t("hero.today_hours")}
                   </p>
                   <p className="text-sm font-bold text-brand-dark">
                     {openingHours}
@@ -112,8 +112,11 @@ export default function HeroSection() {
           </motion.div>
 
           {/* Right Content - Visual */}
-          <motion.div style={{ y: y1 }} className="relative hidden lg:block">
-            <div className="relative z-10 w-full max-w-[500px] mx-auto">
+          <motion.div
+            style={{ y: y1 }}
+            className="relative block mt-12 lg:mt-0"
+          >
+            <div className="relative z-10 w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[500px] mx-auto">
               <motion.div
                 animate={{
                   y: [0, -15, 0],
@@ -143,10 +146,10 @@ export default function HeroSection() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-brand-dark">
-                      4.9/5 Rating
+                      4.9/5 {t("hero.rating_label")}
                     </p>
                     <p className="text-[10px] text-brand-dark/60">
-                      Google Reviews
+                      {t("hero.reviews_label")}
                     </p>
                   </div>
                 </motion.div>
@@ -161,10 +164,10 @@ export default function HeroSection() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-brand-dark">
-                      Authentic
+                      {t("hero.authentic_label")}
                     </p>
                     <p className="text-[10px] text-brand-dark/60">
-                      Spices from India
+                      {t("hero.spices_label")}
                     </p>
                   </div>
                 </motion.div>
@@ -183,7 +186,7 @@ export default function HeroSection() {
         className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
       >
         <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-dark/40">
-          Discover
+          {t("hero.discover")}
         </span>
         <motion.div
           animate={{ y: [0, 10, 0] }}

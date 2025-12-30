@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "react-i18next";
+import { createReview } from "../../api/reviewApi";
+import { toast } from "sonner";
 
 // Lucide Star Rating Component
 function StarRating({ value, onChange, size = 28 }) {
@@ -57,7 +59,12 @@ export default function FeedbackPopup() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(5);
-  const [form, setForm] = useState({ message: "", email: "", phone: "" });
+  const [form, setForm] = useState({
+    name: "",
+    message: "",
+    email: "",
+    phone: "",
+  });
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -66,15 +73,26 @@ export default function FeedbackPopup() {
 
   async function onSubmit(e) {
     e.preventDefault();
-    if (!form.message.trim()) return;
+    if (!form.message.trim() || !form.name.trim()) {
+      toast.error("Please provide your name and message");
+      return;
+    }
 
     try {
       setSubmitting(true);
-      // Simulate API call
-      await new Promise((r) => setTimeout(r, 700));
+      await createReview({
+        name: form.name.trim(),
+        content: form.message.trim(),
+        rating: rating,
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+      });
       setDone(true);
-      setForm({ message: "", email: "", phone: "" });
+      setForm({ name: "", message: "", email: "", phone: "" });
       setRating(5);
+      toast.success("Thank you for your feedback!");
+    } catch (error) {
+      toast.error(error.message || "Failed to submit feedback");
     } finally {
       setSubmitting(false);
     }
@@ -100,7 +118,9 @@ export default function FeedbackPopup() {
           aria-label="Open feedback"
         >
           <MessageSquare size={20} className="fill-white/20" />
-          <span className="font-bold text-sm hidden sm:inline">Feedback</span>
+          <span className="font-bold text-sm hidden sm:inline">
+            {t("sections.feedback.trigger")}
+          </span>
 
           {/* Pulse Effect */}
           <span className="absolute inset-0 rounded-full animate-ping bg-brand-primary/50 -z-10" />
@@ -129,17 +149,16 @@ export default function FeedbackPopup() {
                   <Send size={28} className="-ml-1 translate-y-0.5" />
                 </div>
                 <h3 className="font-cutive text-xl font-bold text-brand-dark mb-2">
-                  Thank You!
+                  {t("sections.feedback.success_title")}
                 </h3>
                 <p className="text-brand-dark/60 mb-8 max-w-[200px] text-sm">
-                  We verify every message personally. Your feedback helps us
-                  grow.
+                  {t("sections.feedback.success_msg")}
                 </p>
                 <Button
                   onClick={ResetAndClose}
                   className="bg-brand-dark text-white hover:bg-black rounded-xl px-8 w-full font-bold h-12"
                 >
-                  Close
+                  {t("sections.feedback.close")}
                 </Button>
               </div>
             ) : (
@@ -154,6 +173,25 @@ export default function FeedbackPopup() {
                   </div>
                 </div>
 
+                {/* Name */}
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="name"
+                    className="text-sm font-bold text-brand-dark"
+                  >
+                    Your Name <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    placeholder="John Doe"
+                    value={form.name}
+                    onChange={onChange}
+                    className="rounded-xl border-gray-200 bg-gray-50/50 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all h-11"
+                    required
+                  />
+                </div>
+
                 {/* Message */}
                 <div className="space-y-2">
                   <Label
@@ -166,7 +204,7 @@ export default function FeedbackPopup() {
                   <Textarea
                     id="message"
                     name="message"
-                    placeholder="Tell us what you loved or how we can improve..."
+                    placeholder={t("sections.feedback.message_placeholder")}
                     value={form.message}
                     onChange={onChange}
                     className="min-h-[120px] resize-none rounded-xl border-gray-200 bg-gray-50/50 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all placeholder:text-gray-400 font-sans"

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { getFoodItem, listFoodItems } from "../../api/foodApi";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { getFoodItem, listFoodItems } from "../../api/foodapi";
 import {
   ArrowLeft,
   Leaf,
@@ -17,10 +18,12 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { resolveImage } from "@/lib/imageUtils";
+import ImageLoader from "@/components/ImageLoader";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export default function ItemDetail() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -70,7 +73,7 @@ export default function ItemDetail() {
             <ChefHat className="absolute inset-0 m-auto w-8 h-8 text-brand-primary animate-pulse" />
           </div>
           <p className="text-brand-dark font-display font-bold uppercase tracking-widest animate-pulse">
-            Preparing the Magic...
+            {t("sections.item_detail.loading_msg")}
           </p>
         </div>
       </div>
@@ -85,11 +88,10 @@ export default function ItemDetail() {
             <Star className="w-12 h-12 text-brand-primary" />
           </div>
           <h2 className="text-4xl font-display font-bold text-brand-dark uppercase tracking-tighter">
-            Dish Not Found
+            {t("sections.item_detail.not_found_title")}
           </h2>
           <p className="text-brand-dark/60 font-sans">
-            {error ||
-              "The flavors you seek are currently wandering in the streets of Madurai."}
+            {error || t("sections.item_detail.not_found_desc")}
           </p>
           <div className="flex justify-center gap-4">
             <Button
@@ -97,13 +99,13 @@ export default function ItemDetail() {
               variant="outline"
               className="rounded-full px-8 border-2"
             >
-              Go Back
+              {t("sections.item_detail.go_back")}
             </Button>
             <Button
               onClick={fetchData}
               className="bg-brand-primary rounded-full px-8"
             >
-              Try Again
+              {t("sections.item_detail.try_again")}
             </Button>
           </div>
         </div>
@@ -121,10 +123,10 @@ export default function ItemDetail() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="absolute inset-0"
         >
-          <img
-            src={resolveImage(item.imageUrl)}
+          <ImageLoader
+            src={resolveImage(item.imageUrl, 1200)}
             alt={item.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-opacity duration-700"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-brand-cream via-brand-dark/20 to-brand-dark/40" />
         </motion.div>
@@ -185,7 +187,7 @@ export default function ItemDetail() {
               {item.isChefRecommended && (
                 <div className="px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 bg-brand-secondary/20 border border-brand-secondary/50 text-brand-secondary backdrop-blur-md">
                   <Star className="w-3 h-3 fill-brand-secondary" />
-                  Chef's Choice
+                  {t("sections.item_detail.chef_choice")}
                 </div>
               )}
             </motion.div>
@@ -207,7 +209,7 @@ export default function ItemDetail() {
               <div className="w-1.5 h-1.5 rounded-full bg-brand-primary" />
               <div className="flex items-center gap-2">
                 <Clock className="w-5 h-5 text-brand-secondary" />
-                <span>15-20 MIN</span>
+                <span>{t("sections.item_detail.prep_time")}</span>
               </div>
             </motion.div>
           </div>
@@ -225,18 +227,18 @@ export default function ItemDetail() {
           >
             <div className="mb-10">
               <h3 className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.4em] mb-4">
-                The Experience
+                {t("sections.item_detail.experience")}
               </h3>
               <p className="text-xl sm:text-2xl text-brand-dark/70 font-sans leading-relaxed">
                 {item.description ||
-                  "A masterpiece of South Indian culinary tradition, prepared with hand-ground spices and the freshest ingredients."}
+                  t("sections.item_detail.experience_default")}
               </p>
             </div>
 
             {item.ingredients?.length > 0 && (
               <div>
                 <h3 className="text-[10px] font-bold text-brand-primary uppercase tracking-[0.4em] mb-6">
-                  Key Ingredients
+                  {t("sections.item_detail.ingredients")}
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {item.ingredients.map((ing, i) => (
@@ -256,7 +258,7 @@ export default function ItemDetail() {
           {/* Similar Items Carousel */}
           <div className="mt-20">
             <h3 className="text-2xl font-display font-bold text-brand-dark uppercase tracking-tight mb-8">
-              You might also love
+              {t("sections.item_detail.similar_title")}
             </h3>
             <div className="grid grid-cols-2 gap-6">
               {similarItems.map((si) => (
@@ -266,9 +268,10 @@ export default function ItemDetail() {
                   className="group block"
                 >
                   <div className="relative aspect-video rounded-3xl overflow-hidden mb-4 premium-shadow">
-                    <img
-                      src={resolveImage(si.imageUrl)}
-                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                    <ImageLoader
+                      src={resolveImage(si.imageUrl, 400)}
+                      alt={si.name}
+                      className="w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/60 to-transparent" />
                     <div className="absolute bottom-4 left-4 text-white">
@@ -293,20 +296,26 @@ export default function ItemDetail() {
           >
             <div className="mb-8 border-b border-white/10 pb-8">
               <p className="text-[10px] font-bold text-brand-secondary uppercase tracking-[0.4em] mb-2">
-                Price Breakdown
+                {t("sections.item_detail.price_breakdown")}
               </p>
               <h4 className="text-5xl font-display font-bold uppercase tracking-tighter">
-                {item.rate} KR
+                {item.rate} {t("common.sek")}
               </h4>
             </div>
 
             <div className="space-y-6 mb-10">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-white/60">Preparation</span>
-                <span className="font-bold">Freshly Cooked</span>
+                <span className="text-white/60">
+                  {t("sections.item_detail.preparation")}
+                </span>
+                <span className="font-bold">
+                  {t("sections.item_detail.prep_fresh")}
+                </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-white/60">Spice Level</span>
+                <span className="text-white/60">
+                  {t("sections.item_detail.spice_level")}
+                </span>
                 <div className="flex gap-1">
                   <Star className="w-3 h-3 fill-brand-primary text-brand-primary" />
                   <Star className="w-3 h-3 fill-brand-primary text-brand-primary" />
@@ -314,24 +323,28 @@ export default function ItemDetail() {
                 </div>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-white/60">Availability</span>
+                <span className="text-white/60">
+                  {t("sections.item_detail.availability")}
+                </span>
                 <span
                   className={
                     item.isAvailable ? "text-emerald-400" : "text-brand-primary"
                   }
                 >
-                  {item.isAvailable ? "In Kitchen" : "Sold Out"}
+                  {item.isAvailable
+                    ? t("sections.item_detail.in_kitchen")
+                    : t("sections.item_detail.sold_out")}
                 </span>
               </div>
             </div>
 
             <Button className="w-full h-20 rounded-full bg-brand-primary hover:bg-white hover:text-brand-primary text-xl font-display font-bold uppercase tracking-[0.1em] transition-all duration-500 shadow-2xl shadow-brand-primary/20 flex items-center justify-center gap-3">
               <ShoppingBag className="w-6 h-6" />
-              Add to Basket
+              {t("sections.item_detail.add_to_basket")}
             </Button>
 
             <p className="text-center text-[10px] text-white/40 uppercase tracking-widest mt-6">
-              Secure Checkout via Foodora
+              {t("sections.item_detail.checkout_foodora")}
             </p>
           </motion.div>
         </div>
