@@ -7,7 +7,9 @@ async function jsonFetch(url, options = {}) {
   });
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(data.message || data.error || `Request failed (${res.status})`);
+    throw new Error(
+      data.message || data.error || `Request failed (${res.status})`,
+    );
   }
   return data;
 }
@@ -17,8 +19,10 @@ export function getSettings() {
 }
 
 export function updateSettings(payload) {
+  const isFormData = payload instanceof FormData;
   return jsonFetch(`${BASE}/api/settings`, {
     method: "PUT",
-    body: JSON.stringify(payload),
+    headers: isFormData ? {} : { "Content-Type": "application/json" },
+    body: isFormData ? payload : JSON.stringify(payload),
   });
 }

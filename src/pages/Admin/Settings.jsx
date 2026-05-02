@@ -23,6 +23,7 @@ export default function Settings() {
     closedDays: [],
     specialClosedDates: [],
     isShopOpen: true,
+    heroImage: "",
   });
 
   useEffect(() => {
@@ -38,9 +39,10 @@ export default function Settings() {
         closingTime: data.closingTime || "22:00",
         closedDays: data.closedDays || [],
         specialClosedDates: (data.specialClosedDates || []).map(
-          (d) => new Date(d).toISOString().split("T")[0]
+          (d) => new Date(d).toISOString().split("T")[0],
         ),
         isShopOpen: data.isShopOpen ?? true,
+        heroImage: data.heroImage || "",
       });
     } catch (e) {
       toast.error("Failed to load settings");
@@ -52,9 +54,32 @@ export default function Settings() {
   const save = async () => {
     try {
       setSaving(true);
-      await updateSettings(form);
+      let payload = form;
+
+      if (form.heroImageFile) {
+        const formData = new FormData();
+        formData.append("openingTime", form.openingTime);
+        formData.append("closingTime", form.closingTime);
+        formData.append("closedDays", JSON.stringify(form.closedDays));
+        formData.append(
+          "specialClosedDates",
+          JSON.stringify(form.specialClosedDates),
+        );
+        formData.append("isShopOpen", String(form.isShopOpen));
+        formData.append("heroImage", form.heroImageFile);
+        payload = formData;
+      }
+
+      const updated = await updateSettings(payload);
+      setForm((prev) => ({
+        ...prev,
+        ...updated,
+        heroImageFile: null,
+        heroImagePreview: null,
+      }));
       toast.success("Settings saved successfully");
     } catch (e) {
+      console.error(e);
       toast.error("Failed to save settings");
     } finally {
       setSaving(false);
@@ -332,6 +357,66 @@ export default function Settings() {
                   No special dates added yet.
                 </div>
               )}
+            </div>
+          </div>
+        </section>
+
+        {/* Hero Image Card */}
+        <section className="bg-white p-8 rounded-3xl border border-brand-dark/5 shadow-sm space-y-6 lg:col-span-2 hover:shadow-md transition-shadow duration-300">
+          <div className="flex items-center gap-3 text-brand-dark mb-2">
+            <div className="p-3 bg-brand-secondary/10 rounded-xl text-brand-secondary">
+              <div className="w-6 h-6 border-2 border-current rounded-full" />
+            </div>
+            <div>
+              <h2 className="font-cutive text-xl font-bold">Hero Image</h2>
+              <p className="text-sm text-brand-dark/40">
+                Update the main circular image on the home page
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-8 items-center">
+            <div className="relative w-40 h-40 shrink-0">
+              <img
+                src={
+                  form.heroImagePreview || form.heroImage || "/temple_1.webp"
+                }
+                alt="Hero Preview"
+                className="w-full h-full object-cover rounded-full border-4 border-brand-dark/10 shadow-lg"
+              />
+              <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/10"></div>
+            </div>
+
+            <div className="flex-1 w-full space-y-4">
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      setForm((prev) => ({
+                        ...prev,
+                        heroImageFile: file,
+                        heroImagePreview: URL.createObjectURL(file),
+                      }));
+                    }
+                  }}
+                  className="block w-full text-sm text-brand-dark/60
+                      file:mr-4 file:py-2.5 file:px-4
+                      file:rounded-full file:border-0
+                      file:text-xs file:font-semibold
+                      file:bg-brand-secondary/10 file:text-brand-secondary
+                      hover:file:bg-brand-secondary/20
+                      cursor-pointer focus:outline-none 
+                    "
+                />
+              </div>
+              <p className="text-xs text-brand-dark/40">
+                Recommended: 1:1 Aspect Ratio (Square), High Resolution.
+                <br />
+                will be automatically cropped to a circle.
+              </p>
             </div>
           </div>
         </section>

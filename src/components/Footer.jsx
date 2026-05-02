@@ -9,18 +9,10 @@ import {
   Instagram,
   Facebook,
   ArrowRight,
+  ArrowUpRight,
 } from "lucide-react";
 import { getSettings } from "../api/settingsApi";
 import { useTranslation } from "react-i18next";
-
-const sectionVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut", staggerChildren: 0.1 },
-  },
-};
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -33,7 +25,6 @@ export default function Footer() {
         if (data.openingTime && data.closingTime) {
           setHours(`${data.openingTime} – ${data.closingTime}`);
         }
-
         // Calculate Label
         const closed = data.closedDays || [];
         const weekdays = [
@@ -60,194 +51,229 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="bg-brand-dark text-brand-cream relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-secondary via-brand-primary to-brand-secondary opacity-20" />
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-brand-primary/5 rounded-full blur-3xl" />
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-brand-secondary/5 rounded-full blur-3xl" />
+    <footer className="relative bg-brand-dark text-brand-cream overflow-hidden pt-24 pb-12">
+      {/* Watermark Logo */}
+      <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 opacity-[0.03] pointer-events-none">
+        <img
+          src="/logo1 (2).svg"
+          alt="Watermark"
+          className="w-[80vw] max-w-[800px] h-auto grayscale invert"
+        />
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 relative z-10">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={sectionVariants}
-          className="grid gap-8 sm:gap-10 md:gap-12 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          {/* Brand Column */}
-          <div className="space-y-4 sm:space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Top Section: CTA & Newsletter */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 mb-24 border-b border-white/10 pb-12">
+          <div className="max-w-xl">
+            <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold uppercase leading-none mb-6">
+              Experience the <br />
+              <span className="text-brand-primary">True Taste</span>
+            </h2>
+            <div className="flex flex-wrap gap-4">
+              <Button
+                asChild
+                className="rounded-full h-14 px-8 bg-brand-cream text-brand-dark font-bold uppercase tracking-wide hover:bg-brand-secondary hover:text-brand-dark transition-all"
+              >
+                <a
+                  href="http://foodora.se/restaurant/vbdi/taste-of-madurai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t("nav.orderUs")} <ArrowRight className="ml-2 w-5 h-5" />
+                </a>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-full h-14 px-8 border-white/20 text-brand-cream hover:bg-white/10 hover:text-white font-bold uppercase tracking-wide"
+              >
+                <Link to="/contact">{t("nav.contact")}</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <SocialCircle
+              href="https://www.instagram.com/taste_ofmadurai"
+              icon={Instagram}
+            />
+            <SocialCircle
+              href="https://www.facebook.com/tasteofmadurai"
+              icon={Facebook}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
+          {/* Brand & Address */}
+          <div className="md:col-span-5 space-y-8">
             <div className="flex items-center gap-3">
               <img
                 src="/logo1 (2).svg"
-                alt="Taste of Madurai Logo"
-                className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
-                style={{
-                  filter:
-                    "brightness(0) invert(1) sepia(10%) saturate(500%) hue-rotate(320deg) opacity(0.9)", // Make it cream/white
-                }}
+                alt="Logo"
+                className="w-12 h-12 invert brightness-0 opacity-90"
               />
               <div>
-                <h1 className="font-display font-bold text-xl sm:text-2xl text-brand-cream uppercase tracking-wide">
-                  Taste of Madurai
-                </h1>
-                <p className="text-[10px] text-brand-secondary tracking-[0.2em] uppercase font-bold">
+                <h3 className="font-display font-bold text-lg uppercase tracking-wider">
+                  {t("brand")}
+                </h3>
+                <p className="text-[10px] text-brand-primary uppercase tracking-[0.2em]">
                   {t("tagline")}
                 </p>
               </div>
             </div>
-            <p className="text-brand-cream/60 text-sm leading-relaxed max-w-xs font-sans">
-              {t("hero.description")}
-            </p>
-            <div className="flex gap-3 sm:gap-4">
-              <SocialLink
-                href="https://www.instagram.com/taste_ofmadurai"
-                icon={Instagram}
-                label="Instagram"
-              />
-              <SocialLink
-                href="https://www.facebook.com/tasteofmadurai"
-                icon={Facebook}
-                label="Facebook"
-              />
-            </div>
-          </div>
 
-          {/* Quick Links */}
-          <div className="space-y-4 sm:space-y-6">
-            <h3 className="font-display text-lg font-bold text-brand-secondary uppercase tracking-wider">
-              {t("footer.quick_links")}
-            </h3>
-            <ul className="space-y-2 sm:space-y-3">
-              <FooterLink to="/">{t("nav.home")}</FooterLink>
-              <FooterLink to="/menu">{t("nav.menu")}</FooterLink>
-              <FooterLink to="/kki">{t("nav.orderUs")}</FooterLink>
-              <FooterLink to="/about">{t("footer.about")}</FooterLink>
-              <FooterLink to="/careers">{t("footer.careers")}</FooterLink>
-            </ul>
-          </div>
-
-          {/* Contact Info */}
-          <div className="space-y-4 sm:space-y-6">
-            <h3 className="font-display text-lg font-bold text-brand-secondary uppercase tracking-wider">
-              {t("footer.contact")}
-            </h3>
-            <ul className="space-y-3 sm:space-y-4 text-sm text-brand-cream/70 font-sans">
-              <li className="flex items-start gap-3">
-                <MapPin className="mt-1 h-5 w-5 text-brand-primary shrink-0" />
-                <a
-                  href="https://maps.app.goo.gl/by2HLDymUM9L14kR6"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-brand-secondary transition-colors"
-                >
-                  Madängsvägen 7,
-                  <br />
-                  129 49 Hägersten,
+            <div className="space-y-4 font-sans text-brand-cream/60 font-light">
+              <p className="flex items-start gap-3">
+                <MapPin className="w-5 h-5 text-brand-primary shrink-0 mt-1" />
+                <span>
+                  Madängsvägen 7, 129 49 Hägersten,
                   <br />
                   Stockholm, Sweden
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Phone className="h-5 w-5 text-brand-primary shrink-0" />
+                </span>
+              </p>
+              <p className="flex items-center gap-3">
+                <Phone className="w-5 h-5 text-brand-primary shrink-0" />
                 <a
                   href="tel:+46734991206"
-                  className="hover:text-brand-secondary transition-colors"
+                  className="hover:text-brand-cream transition-colors"
                 >
                   +46-734991206
                 </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail className="h-5 w-5 text-brand-primary shrink-0" />
+              </p>
+              <p className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-brand-primary shrink-0" />
                 <a
                   href="mailto:info@tasteofmadurai.com"
-                  className="hover:text-brand-secondary transition-colors"
+                  className="hover:text-brand-cream transition-colors"
                 >
                   info@tasteofmadurai.com
                 </a>
+              </p>
+            </div>
+          </div>
+
+          {/* Sitemaps */}
+          <div className="md:col-span-2">
+            <h4 className="font-bold uppercase tracking-widest text-sm text-brand-primary mb-6">
+              {t("footer.quick_links")}
+            </h4>
+            <ul className="space-y-4 text-brand-cream/70 font-medium">
+              <li>
+                <Link
+                  to="/"
+                  className="hover:text-brand-cream transition-colors flex items-center gap-2 group"
+                >
+                  {t("nav.home")}{" "}
+                  <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/menu"
+                  className="hover:text-brand-cream transition-colors flex items-center gap-2 group"
+                >
+                  {t("nav.menu")}{" "}
+                  <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/about"
+                  className="hover:text-brand-cream transition-colors flex items-center gap-2 group"
+                >
+                  {t("footer.about")}{" "}
+                  <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/reviews"
+                  className="hover:text-brand-cream transition-colors flex items-center gap-2 group"
+                >
+                  {t("footer.reviews")}{" "}
+                  <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Hours & CTA */}
-          <div className="space-y-4 sm:space-y-6">
-            <h3 className="font-display text-lg font-bold text-brand-secondary uppercase tracking-wider">
-              {t("nav.openingHours")}
-            </h3>
-            <div className="bg-white/5 rounded-xl p-4 border border-white/5 backdrop-blur-sm">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-brand-primary font-bold text-sm uppercase">
+          <div className="md:col-span-2">
+            <h4 className="font-bold uppercase tracking-widest text-sm text-brand-primary mb-6">
+              Legal
+            </h4>
+            <ul className="space-y-4 text-brand-cream/70 font-medium">
+              <li>
+                <Link
+                  to="/privacy"
+                  className="hover:text-brand-cream transition-colors"
+                >
+                  {t("footer.privacy")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/terms"
+                  className="hover:text-brand-cream transition-colors"
+                >
+                  {t("footer.terms")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/cookies"
+                  className="hover:text-brand-cream transition-colors"
+                >
+                  Cookies
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Hours Card */}
+          <div className="md:col-span-3">
+            <div className="bg-white/5 border border-white/5 rounded-2xl p-6 backdrop-blur-sm">
+              <h4 className="font-bold uppercase tracking-widest text-sm text-brand-primary mb-4">
+                {t("nav.openingHours")}
+              </h4>
+              <div className="flex justify-between items-center">
+                <span className="text-brand-cream font-bold text-xl">
                   {daysLabel}
                 </span>
-                <span className="text-brand-cream font-bold text-sm font-sans">
-                  {hours}
-                </span>
+                <div className="text-right">
+                  <span className="block text-brand-cream/60 text-xs uppercase">
+                    Time
+                  </span>
+                  <span className="block text-brand-cream font-mono">
+                    {hours}
+                  </span>
+                </div>
               </div>
             </div>
-            <Button
-              asChild
-              className="w-full bg-brand-primary text-white hover:bg-brand-secondary hover:text-brand-dark font-bold rounded-xl h-12 text-sm uppercase tracking-wide shadow-lg shadow-brand-primary/20 transition-all duration-300"
-            >
-              <a
-                href="http://foodora.se/restaurant/vbdi/taste-of-madurai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2"
-              >
-                {t("nav.orderUs")} - Foodora
-                <ArrowRight className="h-4 w-4" />
-              </a>
-            </Button>
           </div>
-        </motion.div>
+        </div>
 
-        <div className="mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-brand-cream/30 font-sans">
+        {/* Bottom Bar */}
+        <div className="mt-20 pt-8 border-t border-white/5 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-xs text-brand-cream/30 uppercase tracking-widest">
           <p>
-            © {new Date().getFullYear()} {t("brand")}. {t("footer.rights")}
+            © {new Date().getFullYear()} {t("brand")}. All Rights Reserved.
           </p>
-          <div className="flex gap-6">
-            <Link
-              to="/privacy"
-              className="hover:text-brand-secondary transition-colors"
-            >
-              {t("footer.privacy")}
-            </Link>
-            <Link
-              to="/terms"
-              className="hover:text-brand-secondary transition-colors"
-            >
-              {t("footer.terms")}
-            </Link>
-          </div>
+          <p>Designed with ❤️ in Stockholm</p>
         </div>
       </div>
     </footer>
   );
 }
 
-function SocialLink({ href, icon: Icon, label }) {
+function SocialCircle({ href, icon: Icon }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={label}
-      className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center text-brand-accent hover:bg-brand-gold hover:text-brand-ink transition-all duration-300 hover:scale-110"
+      className="w-14 h-14 rounded-full border border-white/20 flex items-center justify-center text-brand-cream hover:bg-brand-primary hover:border-brand-primary hover:text-white transition-all duration-300 group"
     >
-      <Icon className="h-5 w-5" />
+      <Icon className="w-6 h-6 group-hover:scale-110 transition-transform" />
     </a>
-  );
-}
-
-function FooterLink({ to, children }) {
-  return (
-    <li className="block">
-      <Link
-        to={to}
-        className="inline-flex items-center gap-2 text-neutral-ivory/70 hover:text-brand-gold hover:translate-x-1 transition-all duration-300"
-      >
-        <span className="h-1 w-1 rounded-full bg-brand-accent/50" />
-        {children}
-      </Link>
-    </li>
   );
 }

@@ -86,88 +86,117 @@ export default function Header() {
   }, []);
 
   return (
-    <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-brand-cream/90 backdrop-blur-md shadow-sm border-b border-brand-dark/5"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto max-w-7xl flex justify-between items-center py-4 px-4 sm:px-6 lg:px-8">
-        {/* Brand */}
-        <Link
-          to="/"
-          className="group flex items-center gap-2 sm:gap-3 z-50 relative"
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${
+          scrolled ? "pt-4 px-4" : "pt-0 px-0"
+        }`}
+      >
+        <div
+          className={`mx-auto max-w-7xl flex justify-between items-center transition-all duration-500 ${
+            scrolled
+              ? "bg-white/80 backdrop-blur-xl rounded-full shadow-lg border border-white/40 py-3 px-6 max-w-5xl"
+              : "bg-transparent py-6 px-4 sm:px-6 lg:px-8"
+          }`}
         >
-          <motion.div
-            whileHover={{ rotate: 10, scale: 1.1 }}
-            transition={{ type: "spring", stiffness: 300 }}
-            className="relative"
+          {/* Brand */}
+          <Link
+            to="/"
+            className="group flex items-center gap-2 sm:gap-3 z-50 relative"
           >
-            <img
-              src="/logo1 (2).svg"
-              alt="Taste of Madurai Logo"
-              className="h-10 w-10 sm:h-12 sm:w-12 object-contain relative z-10"
-              style={{
-                // Adjust filter to match new palette if needed, or remove for original logo colors
-                filter:
-                  "brightness(0) saturate(100%) invert(14%) sepia(35%) saturate(366%) hue-rotate(314deg) brightness(97%) contrast(98%)", // Dark charcoal
-              }}
-            />
-          </motion.div>
-          <div className="flex flex-col">
-            <span className="font-display uppercase text-xl sm:text-2xl font-bold text-brand-dark leading-none tracking-tight">
-              {t("brand")}
-            </span>
-            <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-brand-primary font-bold">
-              {t("tagline")}
-            </span>
-          </div>
-        </Link>
-
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-4">
-          <nav className="flex items-center gap-6">
-            <DesktopItem to="/" end>
-              {t("nav.home")}
-            </DesktopItem>
-            <DesktopItem to="/menu">{t("nav.menu")}</DesktopItem>
-            <DesktopItem to="/contact">{t("nav.contact")}</DesktopItem>
-          </nav>
-
-          <div className="flex items-center gap-3 pl-4 border-l border-brand-dark/10">
-            <LanguageSwitcher />
-            <Button
-              asChild
-              className="bg-brand-primary hover:bg-red-700 text-white rounded-full px-6 font-bold uppercase tracking-wide text-xs shadow-lg shadow-brand-primary/20 transition-transform active:scale-95"
+            <motion.div
+              whileHover={{ rotate: 10, scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="relative"
             >
-              <Link to="/menu">
-                {t("nav.orderUs")} <ShoppingBag className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
+              <img
+                src="/logo1 (2).svg"
+                alt="Taste of Madurai Logo"
+                className={`transition-all duration-300 object-contain ${
+                  scrolled ? "h-8 w-8" : "h-10 w-10 sm:h-12 sm:w-12"
+                }`}
+                style={{
+                  filter:
+                    "brightness(0) saturate(100%) invert(14%) sepia(35%) saturate(366%) hue-rotate(314deg) brightness(97%) contrast(98%)",
+                }}
+              />
+            </motion.div>
+            <div
+              className={`flex flex-col transition-opacity duration-300 ${scrolled ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}
+            >
+              <span className="font-display uppercase text-xl sm:text-2xl font-bold text-brand-dark leading-none tracking-tight">
+                {t("brand")}
+              </span>
+              <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-brand-primary font-bold">
+                {t("tagline")}
+              </span>
+            </div>
+            {/* Logo Text for Scrolled State */}
+            <div
+              className={`font-display font-bold text-lg text-brand-dark uppercase tracking-wide transition-all duration-300 ${scrolled ? "opacity-100 w-auto ml-2" : "opacity-0 w-0 overflow-hidden"}`}
+            >
+              TOM
+            </div>
+          </Link>
+
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-1">
+            <nav className="flex items-center gap-1 bg-brand-dark/5 rounded-full p-1 border border-brand-dark/5">
+              <DesktopItem to="/" end scrolled={scrolled}>
+                {t("nav.home")}
+              </DesktopItem>
+              <DesktopItem to="/menu" scrolled={scrolled}>
+                {t("nav.menu")}
+              </DesktopItem>
+              <DesktopItem to="/contact" scrolled={scrolled}>
+                {t("nav.contact")}
+              </DesktopItem>
+            </nav>
+
+            <div className="flex items-center gap-2 pl-2">
+              <LanguageSwitcher />
+              <Button
+                asChild
+                className={`rounded-full font-bold uppercase tracking-wide text-xs shadow-lg shadow-brand-primary/20 transition-all ${
+                  scrolled
+                    ? "h-10 px-5 bg-brand-primary hover:bg-brand-dark text-white"
+                    : "h-11 px-6 bg-brand-primary hover:bg-brand-dark text-white"
+                }`}
+              >
+                <Link to="/menu">
+                  {scrolled ? (
+                    <ShoppingBag className="w-4 h-4" />
+                  ) : (
+                    <>
+                      {t("nav.orderUs")}{" "}
+                      <ShoppingBag className="w-4 h-4 ml-2" />
+                    </>
+                  )}
+                </Link>
+              </Button>
+            </div>
           </div>
+
+          {/* Mobile toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Toggle menu"
+            className="flex md:hidden relative z-50 h-10 w-10 rounded-full hover:bg-brand-dark/5"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggle();
+            }}
+          >
+            <Menu className="h-6 w-6 text-brand-dark" />
+          </Button>
         </div>
+      </header>
 
-        {/* Mobile toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Toggle menu"
-          className="flex md:hidden relative z-50 h-10 w-10 rounded-full hover:bg-brand-dark/5"
-          onClick={(e) => {
-            e.stopPropagation();
-            toggle();
-          }}
-        >
-          <Menu className="h-6 w-6 text-brand-dark" />
-        </Button>
-      </div>
-
-      {/* Mobile drawer */}
+      {/* Mobile Menu Drawer (keeping existing logic, just wrapping layout) */}
       <AnimatePresence>
         {open && (
           <>
-            {/* Overlay */}
             <motion.div
               key="overlay"
               initial="closed"
@@ -178,8 +207,6 @@ export default function Header() {
               aria-hidden="true"
               onPointerDown={close}
             />
-
-            {/* Right drawer */}
             <motion.aside
               key="panel"
               initial="closed"
@@ -188,7 +215,7 @@ export default function Header() {
               variants={menuVariants}
               className="fixed right-0 top-0 bottom-0 z-[9999] w-full sm:w-[24rem] bg-brand-cream border-l border-brand-dark/10 shadow-2xl flex flex-col"
             >
-              {/* Top bar */}
+              {/* Mobile Menu Content Same as Before */}
               <div className="flex items-center justify-between px-6 py-5 border-b border-brand-dark/5">
                 <span className="font-display text-xl font-bold text-brand-dark uppercase">
                   {t("nav.menu_label")}
@@ -202,8 +229,6 @@ export default function Header() {
                   <X className="h-6 w-6 text-brand-dark" />
                 </Button>
               </div>
-
-              {/* Nav list */}
               <nav className="flex-1 overflow-y-auto py-6 px-4">
                 <motion.ul
                   variants={containerVariants}
@@ -223,7 +248,6 @@ export default function Header() {
                   <MobileItem to="/contact" onClick={close}>
                     {t("nav.contact")}
                   </MobileItem>
-
                   <motion.li variants={itemVariants} className="pt-8">
                     <Button
                       asChild
@@ -233,9 +257,7 @@ export default function Header() {
                       <Link to="/menu">{t("common.open")}</Link>
                     </Button>
                   </motion.li>
-
                   <motion.li variants={itemVariants} className="pt-8">
-                    <div className="h-px w-full bg-brand-dark/10 mb-6" />
                     <div className="flex justify-between items-center px-2">
                       <span className="text-sm font-medium text-brand-dark/60">
                         {t("footer.language")}
@@ -245,33 +267,25 @@ export default function Header() {
                   </motion.li>
                 </motion.ul>
               </nav>
-
-              {/* Footer info */}
-              <div className="p-6 bg-brand-dark text-brand-cream">
-                <p className="text-brand-secondary text-xs font-bold uppercase tracking-wider mb-1">
-                  {t("nav.openingHours")}
-                </p>
-                <p className="font-sans text-lg">Sat & Sun · 10:00 – 19:00</p>
-              </div>
             </motion.aside>
           </>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
 
 /* ---------------- Subcomponents ---------------- */
-function DesktopItem({ to, end = false, children }) {
+function DesktopItem({ to, end = false, children, scrolled }) {
   return (
     <NavLink
       to={to}
       end={end}
       className={({ isActive }) =>
-        `relative text-sm font-bold uppercase tracking-wide transition-colors duration-200 ${
+        `relative px-4 py-2 text-xs font-bold uppercase tracking-wide transition-all duration-300 rounded-full ${
           isActive
-            ? "text-brand-primary"
-            : "text-brand-dark/70 hover:text-brand-primary"
+            ? "bg-white text-brand-primary shadow-sm"
+            : "text-brand-dark/60 hover:text-brand-dark hover:bg-brand-dark/5"
         }`
       }
     >

@@ -1,7 +1,6 @@
 // src/App.jsx
 import React, { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import Loader from "@/components/Loader"; // add a small spinner or skeleton here
 
 // ✅ Lazy-load all pages to reduce initial bundle size
@@ -72,11 +71,9 @@ export default function App() {
 /* ---------------- Fallback Loader ---------------- */
 function FullPageFallback() {
   return (
-    <div className="flex items-center justify-center h-screen bg-[#F8F4EC]">
-      <Loader />
-      <p className="ml-2 font-cutive text-[#728175]">
-        {useTranslation().t("common.loading")}
-      </p>
+    <div className="flex flex-col items-center justify-center h-screen bg-[#F8F4EC] space-y-4">
+      <Loader size={48} color="#D91729" />
+      <div className="h-4 w-32 skeleton-shimmer rounded-full opacity-60" />
     </div>
   );
 }
