@@ -283,3 +283,26 @@
 /* Hide scrollbar visually on carousel */
 .scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ============================================================
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Disable heavy SVG filter animation on mobile to prevent GPU stuttering */
+  .grain-overlay::after {
+    animation: none !important;
+    opacity: 0.015 !important;
+  }
+
+  /* Reduce expensive backdrop blur calculations on mobile */
+  .glass, .glass-cream, .premium-glass {
+    backdrop-filter: blur(8px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+  }
+
+  /* Disable heavy continuous transform animations */
+  .animate-float, .animate-bounce-subtle {
+    animation: none !important;
+    transform: none !important;
+  }
+}
