@@ -4,7 +4,7 @@ import {
   Leaf, Search, Utensils, ArrowRight, Star, SlidersHorizontal,
   X, Flame, Coffee, Sandwich, Grid3x3, LayoutList, ChevronDown
 } from "lucide-react";
-import { listFoodItems } from "../../api/foodapi";
+import { listFoodItems } from "../../api/foodApi";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { resolveImage } from "@/lib/imageUtils";

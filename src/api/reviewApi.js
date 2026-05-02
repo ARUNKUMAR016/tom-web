@@ -1,4 +1,4 @@
-import { jsonFetch, BASE } from "./foodapi";
+import { jsonFetch, BASE } from "./foodApi";
 
 // Public: Submit a review
 export const createReview = (payload) => {

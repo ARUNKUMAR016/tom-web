@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { getFoodItem, listFoodItems } from "../../api/foodapi";
+import { getFoodItem, listFoodItems } from "../../api/foodApi";
 import {
   ArrowLeft,
   Leaf,

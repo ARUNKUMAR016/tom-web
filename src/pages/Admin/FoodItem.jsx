@@ -1,6 +1,6 @@
 // src/pages/Admin/FoodItem.jsx
 import React, { useState, useMemo } from "react";
-import { createFoodItem } from "../../api/foodapi";
+import { createFoodItem } from "../../api/foodApi";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Upload, X, Check, Flame, Plus } from "lucide-react";
 import { toast } from "sonner";

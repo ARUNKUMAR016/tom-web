@@ -5,7 +5,7 @@ import {
   listFoodItems,
   deleteFoodItem,
   updateFoodItem,
-} from "../../api/foodapi";
+} from "../../api/foodApi";
 import { Link } from "react-router-dom";
 import {
   Pencil,

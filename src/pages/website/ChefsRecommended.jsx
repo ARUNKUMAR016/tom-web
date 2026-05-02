@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import { Star, ArrowRight, Flame, ChevronRight, ChevronLeft, Pause, Play } from "lucide-react";
-import { listFoodItems } from "../../api/foodapi";
+import { listFoodItems } from "../../api/foodApi";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
